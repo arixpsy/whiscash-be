@@ -1,7 +1,7 @@
 import '@/utils/env'
 import express from 'express'
 
-const { PORT } = process.env;
+const { PORT } = process.env
 
 const app = express()
 
