@@ -1,13 +1,13 @@
-import './utils/env'
-import express, { type Express, type Request, type Response } from 'express'
+import '@/utils/env'
+import express from 'express'
 
 const { PORT } = process.env;
 
-const app: Express = express()
+const app = express()
 
 app.use(express.json())
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req, res) => {
   res.send('Whiscash Backend')
 })
 
@@ -16,8 +16,8 @@ app.get('/healthcheck', (_req, res) => {
     message: 'Server is running',
     uptime: process.uptime(),
     timestamp: Date.now(),
-  });
-});
+  })
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`)
