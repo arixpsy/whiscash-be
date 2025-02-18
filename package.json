@@ -2,16 +2,20 @@
   "name": "whiscash-be",
   "version": "1.0.0",
   "type": "module",
+  "exports": "./dist/index.mjs",
   "scripts": {
     "prepare": "simple-git-hooks",
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.mjs",
+    "build": "pkgroll"
   },
   "author": "Arix Phua",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^22.13.4",
+    "pkgroll": "^2.10.0",
     "prettier": "^3.5.1",
     "simple-git-hooks": "^2.11.1",
     "tsx": "^4.19.2",
