@@ -1,9 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 
-export const authenticate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const authenticate = (req: Request, res: Response, next: NextFunction) => {
   next()
 }
+
+export default authenticate

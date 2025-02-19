@@ -1,0 +1,25 @@
+import cors from 'cors'
+import express from 'express'
+import rateLimit from 'express-rate-limit'
+import authenticate from './auth'
+
+const Middleware = {
+  authenticate,
+  cors: cors(),
+  json: express.json(),
+  rateLimit: rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    handler: (req, res) => {
+      console.warn(`DDoS Attempt from ${req.ip}`)
+
+      res.status(429).json({
+        code: 429,
+        message: 'Request limit reached',
+        description: 'Request limit reached. Please try again later',
+      })
+    },
+  }),
+}
+
+export default Middleware

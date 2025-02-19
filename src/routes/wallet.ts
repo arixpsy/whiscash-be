@@ -1,8 +1,9 @@
 import { Router } from 'express'
-import { createWallet } from '@/controllers/wallet'
+import { createWallet, getWallets } from '@/controllers/wallet'
 
 const walletRoutes = Router()
 
+walletRoutes.get('/', getWallets)
 walletRoutes.post('/', createWallet)
 
 export default walletRoutes
