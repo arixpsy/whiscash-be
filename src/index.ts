@@ -1,5 +1,6 @@
 import '@/utils/env'
 import express from 'express'
+import router from '@/routes'
 
 const { PORT } = process.env
 
@@ -16,6 +17,16 @@ app.get('/healthcheck', (_req, res) => {
     message: 'Server is running',
     uptime: process.uptime(),
     timestamp: Date.now(),
+  })
+})
+
+app.use('/api', router)
+
+app.all('*', (_req, res) => {
+  res.status(404).json({
+    code: 404,
+    message: 'Not found',
+    description: 'The route you are accessing does not exist',
   })
 })
 
