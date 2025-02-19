@@ -9,6 +9,7 @@ const app = express()
 
 app.use(Middleware.json)
 app.use(Middleware.cors)
+app.use(Middleware.morgan)
 app.use(Middleware.rateLimit)
 
 app.get('/', (req, res) => {

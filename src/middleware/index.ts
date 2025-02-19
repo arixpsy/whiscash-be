@@ -1,12 +1,14 @@
 import cors from 'cors'
-import express from 'express'
+import express, { type Handler } from 'express'
 import rateLimit from 'express-rate-limit'
+import morgan from 'morgan'
 import authenticate from './auth'
 
-const Middleware = {
+const Middleware: Record<string, Handler> = {
   authenticate,
   cors: cors(),
   json: express.json(),
+  morgan: morgan('tiny'),
   rateLimit: rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 100,
