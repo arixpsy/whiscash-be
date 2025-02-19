@@ -1,12 +1,29 @@
 import '@/utils/env'
 import express from 'express'
 import router from '@/routes'
+import rateLimit from 'express-rate-limit'
 
 const { PORT } = process.env
 
 const app = express()
 
 app.use(express.json())
+
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    handler: (req, res) => {
+      console.warn(`DDoS Attempt from ${req.ip}`)
+
+      res.status(429).json({
+        code: 429,
+        message: 'Request limit reached',
+        description: 'Request limit reached. Please try again later',
+      })
+    },
+  })
+)
 
 app.get('/', (req, res) => {
   res.send('Whiscash Backend')
