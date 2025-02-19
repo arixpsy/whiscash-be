@@ -12,7 +12,19 @@ const EnvironmentVariablesSchema = z.object({
     .url()
     .refine(
       (url) => url.startsWith('postgres://') || url.startsWith('postgresql://'),
-      'DB_URL must be a valid postgresql url'
+      'DATABASE_URL must be a valid postgresql url'
+    ),
+  CLERK_PUBLISHABLE_KEY: z
+    .string()
+    .refine(
+      (url) => url.startsWith('pk'),
+      'CLERK_PUBLISHABLE_KEY must be a valid key'
+    ),
+  CLERK_SECRET_KEY: z
+    .string()
+    .refine(
+      (url) => url.startsWith('sk'),
+      'CLERK_PUBLISHABLE_KEY must be a valid key'
     ),
 })
 
