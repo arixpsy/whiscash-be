@@ -88,12 +88,12 @@ export const transactionsRelations = relations(
 )
 
 // export const subscriptionsTable = pgTable('subscriptions', {
-  // id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  // walletId: integer().references(() => walletsTable.id),
-  // amount: numeric(),
-  // frequency: varchar(), // Options like 'daily', 'weekly', 'monthly', 'yearly'
-  // startDate: timestamp().defaultNow(),
-  // nextPaymentDate: timestamp(),
-  // description: varchar(),
-  // ...timestamps,
+// id: integer().primaryKey().generatedAlwaysAsIdentity(),
+// walletId: integer().references(() => walletsTable.id),
+// amount: numeric(),
+// frequency: varchar(), // Options like 'daily', 'weekly', 'monthly', 'yearly'
+// startDate: timestamp().defaultNow(),
+// nextPaymentDate: timestamp(),
+// description: varchar(),
+// ...timestamps,
 // })

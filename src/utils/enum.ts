@@ -6,7 +6,8 @@ export const SpendingPeriod = {
   All: 'ALL',
 } as const
 
-export type SpendingPeriod = (typeof SpendingPeriod)[keyof typeof SpendingPeriod]
+export type SpendingPeriod =
+  (typeof SpendingPeriod)[keyof typeof SpendingPeriod]
 
 export const Category = {
   Entertainment: 'ENTERTAINMENT',
