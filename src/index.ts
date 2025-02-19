@@ -1,14 +1,17 @@
 import '@/utils/env'
+import { clerkMiddleware } from '@clerk/express'
+import cors from 'cors'
 import express from 'express'
-import router from '@/routes'
 import rateLimit from 'express-rate-limit'
+import router from '@/routes'
 
 const { PORT } = process.env
 
 const app = express()
 
 app.use(express.json())
-
+app.use(clerkMiddleware())
+app.use(cors())
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
