@@ -1,6 +1,26 @@
-import type { NextFunction, Request, Response } from 'express'
+import { authenticateRequest } from '@clerk/express'
+import type { NextFunction, Request, Response as Res } from 'express'
+import clerkClient from '@/utils/clerk'
+import response from '@/utils/response'
 
-const authenticate = (req: Request, res: Response, next: NextFunction) => {
+const authenticate = async (req: Request, res: Res, next: NextFunction) => {
+  const requestState = await authenticateRequest({
+    clerkClient,
+    request: req,
+  })
+
+  if (!requestState.isSignedIn) {
+    response.unauthorized(res, {
+      message: 'Unauthorized',
+      description: 'Invalid token provided',
+    })
+    next(new Error('User is not authenticated'))
+  }
+
+  const auth = requestState.toAuth()
+
+  Object.assign(req, { auth })
+
   next()
 }
 

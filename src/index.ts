@@ -2,6 +2,7 @@ import '@/utils/env'
 import express from 'express'
 import router from '@/routes'
 import Middleware from '@/middleware'
+import response from '@/utils/response'
 
 const { PORT } = process.env
 
@@ -17,7 +18,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/healthcheck', (_req, res) => {
-  res.json({
+  response.ok(res, {
     message: 'Server is running',
     uptime: process.uptime(),
     timestamp: Date.now(),
@@ -27,8 +28,7 @@ app.get('/healthcheck', (_req, res) => {
 app.use('/api', Middleware.authenticate, router)
 
 app.all('*', (_req, res) => {
-  res.status(404).json({
-    code: 404,
+  response.notFound(res, {
     message: 'Not found',
     description: 'The route you are accessing does not exist',
   })
