@@ -1,3 +1,4 @@
+import { consola } from 'consola'
 import cors from 'cors'
 import express, { type Handler } from 'express'
 import rateLimit from 'express-rate-limit'
@@ -13,7 +14,7 @@ const Middleware: Record<string, Handler> = {
     windowMs: 15 * 60 * 1000,
     limit: 100,
     handler: (req, res) => {
-      console.warn(`DDoS Attempt from ${req.ip}`)
+      consola.warn(`DDoS Attempt from ${req.ip}`)
 
       res.status(429).json({
         code: 429,

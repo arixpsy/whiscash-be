@@ -1,4 +1,5 @@
 import '@/utils/env'
+import { consola } from 'consola'
 import express from 'express'
 import router from '@/routes'
 import Middleware from '@/middleware'
@@ -35,5 +36,5 @@ app.all('*', (_req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`)
+  consola.success(`Server is running on port: ${PORT}`)
 })

@@ -1,3 +1,4 @@
+import { consola } from 'consola'
 import 'dotenv/config'
 import { ZodError, z } from 'zod'
 
@@ -31,7 +32,7 @@ const EnvironmentVariablesSchema = z.object({
 try {
   EnvironmentVariablesSchema.parse(process.env)
 } catch (error) {
-  if (error instanceof ZodError) console.error(error.errors)
+  if (error instanceof ZodError) consola.error(error.errors)
 
   process.exit(1)
 }
