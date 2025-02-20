@@ -10,10 +10,7 @@ const authenticate = async (req: Request, res: Res, next: NextFunction) => {
   })
 
   if (!requestState.isSignedIn) {
-    response.unauthorized(res, {
-      message: 'Unauthorized',
-      description: 'Invalid token provided',
-    })
+    response.unauthorized(res)
     next(new Error('User is not authenticated'))
   }
 

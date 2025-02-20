@@ -26,7 +26,7 @@ export const categoryEnum = pgEnum('category', objectToPgEnum(Category))
 
 export const settingsTable = pgTable('settings', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  userId: uuid().notNull(),
+  userId: varchar().notNull(),
   timezone: varchar().notNull(),
 })
 
@@ -34,10 +34,10 @@ export const walletsTable = pgTable(
   'wallets',
   {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    userId: uuid().notNull(),
+    userId: varchar().notNull(),
     name: varchar({ length: 50 }).notNull(),
     currency: varchar({ length: 3 }).notNull(),
-    defaultSpendingPeroid: spendingPeriodEnum('spending_period').default(
+    defaultSpendingPeriod: spendingPeriodEnum('spending_period').default(
       SpendingPeriod.Month
     ),
     orderIndex: integer().default(0),

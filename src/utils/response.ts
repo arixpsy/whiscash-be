@@ -16,12 +16,17 @@ const buildErrorResponse =
     buildResponse(res, code, body)
 const buildSuccessResponse = (code: number) => (res: Res, body: any) =>
   buildResponse(res, code, body)
+const buildUnauthorizedResponse = (res: Res) =>
+  buildResponse(res, 401, {
+    message: 'Unauthorized',
+    description: 'Invalid token provided',
+  })
 
 const response = {
   ok: buildSuccessResponse(200),
   created: buildSuccessResponse(201),
   badRequest: buildErrorResponse(400),
-  unauthorized: buildErrorResponse(401),
+  unauthorized: buildUnauthorizedResponse,
   notFound: buildErrorResponse(404),
   tooManyRequest: buildErrorResponse(429),
   internalServerError: buildErrorResponse(500),
