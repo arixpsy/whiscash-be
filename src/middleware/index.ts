@@ -13,6 +13,7 @@ const Middleware: Record<string, Handler> = {
   rateLimit: rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 100,
+    validate: { xForwardedForHeader: false },
     handler: (req, res) => {
       consola.warn(`DDoS Attempt from ${req.ip}`)
 
