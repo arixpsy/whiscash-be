@@ -21,7 +21,7 @@ const getWallets = (userId: string) =>
     .from(walletsTable)
     .where(eq(walletsTable.userId, userId))
 
-const insertWallet = (wallet: NewWallet) => {
+const insertWallet = async (wallet: NewWallet) => {
   const userWalletCount = db.$with('user_wallet_count').as(
     db
       .select({ value: sql`count(*)`.as('value') })
@@ -29,7 +29,7 @@ const insertWallet = (wallet: NewWallet) => {
       .where(eq(walletsTable.userId, wallet.userId))
   )
 
-  return db
+  const wallets = await db
     .with(userWalletCount)
     .insert(walletsTable)
     .values({
@@ -48,6 +48,8 @@ const insertWallet = (wallet: NewWallet) => {
       createdAt: walletsTable.createdAt,
       deletedAt: walletsTable.deletedAt,
     })
+
+  return wallets[0]
 }
 
 const walletDAO = {
