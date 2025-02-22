@@ -4,7 +4,7 @@ import response from '@/utils/response'
 
 export const createWallet = async (req: Request, res: Response) => {
   const { userId } = req.auth
-  const { name, defaultSpendingPeriod, currency } = req.body
+  const { name, defaultSpendingPeriod, currency, country } = req.body
 
   if (!userId) {
     response.unauthorized(res)
@@ -15,6 +15,7 @@ export const createWallet = async (req: Request, res: Response) => {
     userId,
     name,
     currency,
+    country,
     defaultSpendingPeriod,
   })
 
