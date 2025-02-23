@@ -40,14 +40,17 @@ export const getAllMainWallets = async (
   res: Response
 ) => {
   const { userId } = req.auth
-  const { searchPhrase } = req.query
+  const { searchPhrase, currency } = req.query
 
   if (!userId) {
     response.unauthorized(res)
     return
   }
 
-  const userWallets = await walletDAO.getAllMainWallets(userId, searchPhrase)
+  const userWallets = await walletDAO.getAllMainWallets(userId, {
+    currency,
+    searchPhrase,
+  })
 
   response.ok(res, userWallets)
 }
@@ -64,7 +67,7 @@ export const getAllWallets = async (
     return
   }
 
-  const userWallets = await walletDAO.getAllWallets(userId, searchPhrase)
+  const userWallets = await walletDAO.getAllWallets(userId, { searchPhrase })
 
   response.ok(res, userWallets)
 }

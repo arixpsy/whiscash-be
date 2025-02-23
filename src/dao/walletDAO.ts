@@ -3,6 +3,10 @@ import { walletsTable } from '@/db/schema'
 import { db } from '@/utils/db'
 
 type NewWallet = typeof walletsTable.$inferInsert
+type GetWalletFilters = {
+  searchPhrase?: string
+  currency?: string
+}
 
 // Return Types
 const WalletResponse = {
@@ -20,7 +24,9 @@ const WalletResponse = {
 }
 
 // Filter Conditions
-const EqualToUserId = (userId: string) => eq(walletsTable.userId, userId)
+const UserIdEqualTo = (userId: string) => eq(walletsTable.userId, userId)
+const CurrencyEqualTo = (currency: string) =>
+  eq(walletsTable.currency, currency)
 const SubWalletofIsNull = isNull(walletsTable.subWalletOf)
 const ArchivedAtIsNull = isNull(walletsTable.archivedAt)
 const NameLike = (searchPhrase: string) =>
@@ -38,19 +44,27 @@ const getWallets = (filters: Array<SQL>, sortBy: SQL) => {
     .orderBy(sortBy)
 }
 
-const getAllWallets = (userId: string, searchPhrase: string) =>
+const getAllWallets = (userId: string, { searchPhrase }: GetWalletFilters) =>
   getWallets(
-    [EqualToUserId(userId), ArchivedAtIsNull, NameLike(searchPhrase)],
+    [
+      UserIdEqualTo(userId),
+      ArchivedAtIsNull,
+      ...(searchPhrase ? [NameLike(searchPhrase)] : []),
+    ],
     SortByOrderIndex
   )
 
-const getAllMainWallets = (userId: string, searchPhrase: string) =>
+const getAllMainWallets = (
+  userId: string,
+  { searchPhrase, currency }: GetWalletFilters
+) =>
   getWallets(
     [
-      EqualToUserId(userId),
+      UserIdEqualTo(userId),
       SubWalletofIsNull,
       ArchivedAtIsNull,
-      NameLike(searchPhrase),
+      ...(searchPhrase ? [NameLike(searchPhrase)] : []),
+      ...(currency ? [CurrencyEqualTo(currency)] : []),
     ],
     SortByCreatedAt
   )
