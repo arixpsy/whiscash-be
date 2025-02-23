@@ -1,26 +1,59 @@
-import { eq, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, ilike, isNull, SQL, sql } from 'drizzle-orm'
 import { walletsTable } from '@/db/schema'
 import { db } from '@/utils/db'
 
 type NewWallet = typeof walletsTable.$inferInsert
 
-const getWallets = (userId: string) =>
-  db
-    .select({
-      id: walletsTable.id,
-      name: walletsTable.name,
-      currency: walletsTable.currency,
-      country: walletsTable.country,
-      defaultSpendingPeriod: walletsTable.defaultSpendingPeriod,
-      orderIndex: walletsTable.orderIndex,
-      archivedAt: walletsTable.archivedAt,
-      subWalletOf: walletsTable.subWalletOf,
-      updatedAt: walletsTable.updatedAt,
-      createdAt: walletsTable.createdAt,
-      deletedAt: walletsTable.deletedAt,
-    })
+// Return Types
+const WalletResponse = {
+  id: walletsTable.id,
+  name: walletsTable.name,
+  currency: walletsTable.currency,
+  country: walletsTable.country,
+  defaultSpendingPeriod: walletsTable.defaultSpendingPeriod,
+  orderIndex: walletsTable.orderIndex,
+  archivedAt: walletsTable.archivedAt,
+  subWalletOf: walletsTable.subWalletOf,
+  updatedAt: walletsTable.updatedAt,
+  createdAt: walletsTable.createdAt,
+  deletedAt: walletsTable.deletedAt,
+}
+
+// Filter Conditions
+const EqualToUserId = (userId: string) => eq(walletsTable.userId, userId)
+const SubWalletofIsNull = isNull(walletsTable.subWalletOf)
+const ArchivedAtIsNull = isNull(walletsTable.archivedAt)
+const NameLike = (searchPhrase: string) =>
+  ilike(walletsTable.name, `%${searchPhrase}%`)
+
+// Sort Values
+const SortByOrderIndex = asc(walletsTable.orderIndex)
+const SortByCreatedAt = asc(walletsTable.createdAt)
+
+const getWallets = (filters: Array<SQL>, sortBy: SQL) => {
+  return db
+    .select(WalletResponse)
     .from(walletsTable)
-    .where(eq(walletsTable.userId, userId))
+    .where(and(...filters))
+    .orderBy(sortBy)
+}
+
+const getAllWallets = (userId: string, searchPhrase: string) =>
+  getWallets(
+    [EqualToUserId(userId), ArchivedAtIsNull, NameLike(searchPhrase)],
+    SortByOrderIndex
+  )
+
+const getAllMainWallets = (userId: string, searchPhrase: string) =>
+  getWallets(
+    [
+      EqualToUserId(userId),
+      SubWalletofIsNull,
+      ArchivedAtIsNull,
+      NameLike(searchPhrase),
+    ],
+    SortByCreatedAt
+  )
 
 const insertWallet = async (wallet: NewWallet) => {
   const userWalletCount = db.$with('user_wallet_count').as(
@@ -37,25 +70,14 @@ const insertWallet = async (wallet: NewWallet) => {
       ...wallet,
       orderIndex: sql`(select * from ${userWalletCount})`,
     })
-    .returning({
-      id: walletsTable.id,
-      name: walletsTable.name,
-      currency: walletsTable.currency,
-      country: walletsTable.country,
-      defaultSpendingPeriod: walletsTable.defaultSpendingPeriod,
-      orderIndex: walletsTable.orderIndex,
-      archivedAt: walletsTable.archivedAt,
-      subWalletOf: walletsTable.subWalletOf,
-      updatedAt: walletsTable.updatedAt,
-      createdAt: walletsTable.createdAt,
-      deletedAt: walletsTable.deletedAt,
-    })
+    .returning(WalletResponse)
 
   return wallets[0]
 }
 
 const walletDAO = {
-  getWallets,
+  getAllWallets,
+  getAllMainWallets,
   insertWallet,
 }
 
