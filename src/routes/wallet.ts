@@ -13,7 +13,7 @@ import {
   CreateWalletRequestSchema,
   GetDashboardWalletsRequest,
   GetWalletsRequestSchema,
-} from '@/@types/wallets'
+} from '@/@types/shared'
 
 const walletRoutes = Router()
 
