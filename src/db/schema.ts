@@ -38,7 +38,7 @@ export const walletsTable = pgTable(
     name: varchar({ length: 50 }).notNull(),
     currency: varchar({ length: 3 }).notNull(),
     country: varchar({ length: 2 }).notNull(),
-    defaultSpendingPeriod: spendingPeriodEnum('spending_period').default(
+    spendingPeriod: spendingPeriodEnum('spending_period').default(
       SpendingPeriod.Month
     ),
     orderIndex: integer().default(0),

@@ -6,10 +6,12 @@ import {
 import {
   createWallet,
   getAllWallets,
+  getAllDashboardWallets,
   getAllMainWallets,
 } from '@/controllers/wallet'
 import {
   CreateWalletRequestSchema,
+  GetDashboardWalletsRequest,
   GetWalletsRequestSchema,
 } from '@/@types/wallets'
 
@@ -19,6 +21,11 @@ walletRoutes.get(
   '/',
   validateRequestQuery(GetWalletsRequestSchema),
   getAllWallets
+)
+walletRoutes.get(
+  '/dashboard',
+  validateRequestQuery(GetDashboardWalletsRequest),
+  getAllDashboardWallets
 )
 walletRoutes.get(
   '/main',
