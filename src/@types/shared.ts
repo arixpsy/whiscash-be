@@ -44,17 +44,6 @@ export const GetDashboardWalletsRequest = z.object({
 export const GetDashboardWalletsResponse = z.array(
   WalletSchema.merge(
     z.object({
-      id: z.number(),
-      name: z.string(),
-      currency: z.string(),
-      country: z.string(),
-      spendingPeriod: z.nativeEnum(SpendingPeriod),
-      orderIndex: z.number(),
-      archivedAt: z.string(),
-      subWalletOf: z.number(),
-      updatedAt: z.string(),
-      createdAt: z.string(),
-      deletedAt: z.string(),
       transactions: z.array(TransactionSchema),
     })
   )
