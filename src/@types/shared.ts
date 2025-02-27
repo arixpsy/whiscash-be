@@ -14,6 +14,13 @@ const TransactionSchema = z.object({
   deletedAt: z.string().nullable(),
 })
 
+const TransactionWithCurrencySchema = TransactionSchema.merge(
+  z.object({
+    currency: z.string(),
+    country: z.string(),
+  })
+)
+
 const WalletSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -29,6 +36,20 @@ const WalletSchema = z.object({
   deletedAt: z.string().nullable(),
 })
 
+const WalletWithSpendingPeriodTotalSchema = WalletSchema.merge(
+  z.object({
+    spendingPeriodTotal: z.string(),
+  })
+)
+
+export const CreateTransactionRequestSchema = z.object({
+  walletId: z.number(),
+  amount: z.number(),
+  category: z.nativeEnum(Category),
+  description: z.string(),
+  paidAt: z.string(),
+})
+
 export const CreateWalletRequestSchema = z.object({
   name: z.string().min(1).max(50),
   currency: z.string().length(3),
@@ -42,11 +63,15 @@ export const GetDashboardWalletsRequest = z.object({
 })
 
 export const GetDashboardWalletsResponse = z.array(
-  WalletSchema.merge(
-    z.object({
-      spendingPeriodTotal: z.string(),
-    })
-  )
+  WalletWithSpendingPeriodTotalSchema
+)
+
+export const GetTransactionRequestSchema = z.object({
+  walletId: z.number(),
+})
+
+export const GetTransactionsResponseSchema = z.array(
+  TransactionWithCurrencySchema
 )
 
 export const GetWalletsRequestSchema = z.object({
@@ -56,12 +81,19 @@ export const GetWalletsRequestSchema = z.object({
 
 export const GetWalletsResponseSchema = z.array(WalletSchema)
 
+export type CreateTransactionRequest = z.infer<
+  typeof CreateTransactionRequestSchema
+>
 export type CreateWalletRequest = z.infer<typeof CreateWalletRequestSchema>
 export type GetDashboardWalletsRequest = z.infer<
   typeof GetDashboardWalletsRequest
 >
 export type GetDashboardWalletsResponse = z.infer<
   typeof GetDashboardWalletsResponse
+>
+export type GetTransactionRequest = z.infer<typeof GetTransactionRequestSchema>
+export type GetTransactionsResponse = z.infer<
+  typeof GetTransactionsResponseSchema
 >
 export type GetWalletsRequest = z.infer<typeof GetWalletsRequestSchema>
 export type GetWalletsResponse = z.infer<typeof GetWalletsResponseSchema>

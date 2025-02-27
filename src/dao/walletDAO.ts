@@ -14,6 +14,7 @@ const CurrencyEqualTo = (currency: string) =>
   eq(walletsTable.currency, currency)
 const SubWalletofIsNull = isNull(walletsTable.subWalletOf)
 const ArchivedAtIsNull = isNull(walletsTable.archivedAt)
+const DeletedAtAtIsNull = isNull(walletsTable.deletedAt)
 const NameLike = (searchPhrase: string) =>
   ilike(walletsTable.name, `%${searchPhrase}%`)
 
@@ -60,6 +61,7 @@ const getAllWallets = (userId: string, { searchPhrase }: GetWalletsRequest) =>
     [
       UserIdEqualTo(userId),
       ArchivedAtIsNull,
+      DeletedAtAtIsNull,
       ...(searchPhrase ? [NameLike(searchPhrase)] : []),
     ],
     SortByOrderIndex
@@ -74,6 +76,7 @@ const getAllMainWallets = (
       UserIdEqualTo(userId),
       SubWalletofIsNull,
       ArchivedAtIsNull,
+      DeletedAtAtIsNull,
       ...(searchPhrase ? [NameLike(searchPhrase)] : []),
       ...(currency ? [CurrencyEqualTo(currency)] : []),
     ],
