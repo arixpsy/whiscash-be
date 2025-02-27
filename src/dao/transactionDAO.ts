@@ -4,6 +4,15 @@ import { db } from '@/utils/db'
 
 const transactionResponse = {
   id: transactionsTable.id,
+  walletId: transactionsTable.walletId,
+  amount: transactionsTable.amount,
+  category: transactionsTable.category,
+  description: transactionsTable.description,
+  paidAt: transactionsTable.paidAt,
+  subscriptionId: transactionsTable.subscriptionId,
+  updatedAt: transactionsTable.updatedAt,
+  createdAt: transactionsTable.createdAt,
+  deletedAt: transactionsTable.deletedAt,
   country: walletsTable.country,
   currency: walletsTable.currency,
 }
@@ -22,6 +31,7 @@ const getTransactions = (filters: Array<SQL>, sortBy: SQL) => {
   return db
     .select(transactionResponse)
     .from(transactionsTable)
+    .innerJoin(walletsTable, eq(transactionsTable.walletId, walletsTable.id))
     .where(and(...filters))
     .orderBy(sortBy)
 }

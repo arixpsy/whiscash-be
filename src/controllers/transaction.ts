@@ -24,8 +24,9 @@ export const getTransactionsByWalletId = async (
 
   // TODO: check walletId belong to userId
 
-  const walletTransactions =
-    await transactionDAO.getTransactionsByWalletId(walletId)
+  const walletTransactions = await transactionDAO.getTransactionsByWalletId(
+    parseInt(walletId as unknown as string)
+  )
 
   response.ok(res, walletTransactions)
 }

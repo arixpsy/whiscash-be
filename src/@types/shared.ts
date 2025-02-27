@@ -67,7 +67,7 @@ export const GetDashboardWalletsResponse = z.array(
 )
 
 export const GetTransactionRequestSchema = z.object({
-  walletId: z.number(),
+  walletId: z.string(),
 })
 
 export const GetTransactionsResponseSchema = z.array(
@@ -98,4 +98,10 @@ export type GetTransactionsResponse = z.infer<
 export type GetWalletsRequest = z.infer<typeof GetWalletsRequestSchema>
 export type GetWalletsResponse = z.infer<typeof GetWalletsResponseSchema>
 export type Transaction = z.infer<typeof TransactionSchema>
+export type TransactionWithCurrency = z.infer<
+  typeof TransactionWithCurrencySchema
+>
 export type Wallet = z.infer<typeof WalletSchema>
+export type WalletWithSpendingPeriodTotal = z.infer<
+  typeof WalletWithSpendingPeriodTotalSchema
+>
