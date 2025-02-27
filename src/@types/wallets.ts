@@ -1,6 +1,6 @@
 import { Category, SpendingPeriod } from '@/utils/enum'
 
-export type RawWalletAndTransaction = {
+export type RawWalletAndSpendingPeriodTotal = {
   id: number
   userId: string
   name: string
@@ -13,15 +13,5 @@ export type RawWalletAndTransaction = {
   updatedAt: string
   createdAt: string
   deletedAt: string
-} & {
-  transactionId: number
-  walletId: number
-  amount: string
-  category: Category
-  description: string
-  paidAt: string
-  subscriptionId: number
-  transactionUpdatedAt: string
-  transactionCreatedAt: string
-  transactionDeletedAt: string
+  spendingPeriodTotal: string
 }

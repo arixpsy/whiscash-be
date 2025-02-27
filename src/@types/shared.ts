@@ -44,8 +44,7 @@ export const GetDashboardWalletsRequest = z.object({
 export const GetDashboardWalletsResponse = z.array(
   WalletSchema.merge(
     z.object({
-      spendingPeriodTotal: z.number(),
-      transactions: z.array(TransactionSchema),
+      spendingPeriodTotal: z.string(),
     })
   )
 )

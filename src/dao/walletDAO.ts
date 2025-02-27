@@ -1,7 +1,7 @@
 import { and, asc, eq, ilike, isNull, SQL, sql } from 'drizzle-orm'
 import type { NeonHttpQueryResult } from 'drizzle-orm/neon-http'
 import type { PgRaw } from 'drizzle-orm/pg-core/query-builders/raw'
-import type { RawWalletAndTransaction } from '@/@types/wallets'
+import type { RawWalletAndSpendingPeriodTotal } from '@/@types/wallets'
 import { type GetWalletsRequest } from '@/@types/shared'
 import { transactionsTable, walletsTable } from '@/db/schema'
 import { db } from '@/utils/db'
@@ -30,25 +30,26 @@ const getWallets = (filters: Array<SQL>, sortBy: SQL) => {
 }
 
 const getAllDashboardWallets = async (userId: string, timezone: string) => {
-  const result: PgRaw<NeonHttpQueryResult<RawWalletAndTransaction>> =
+  const result: PgRaw<NeonHttpQueryResult<RawWalletAndSpendingPeriodTotal>> =
     db.execute(sql`
     SELECT
       w.id, w.name, w.currency, w.country, w.spending_period "spendingPeriod", w.order_index "orderIndex", w.archived_at "archivedAt", w.sub_wallet_of "subWalletOf", w.updated_at "updatedAt", w.created_at "createdAt", w.deleted_at "deletedAt",
-      t.id "transactionId", t.wallet_id "walletId", t.amount, t.category, t.description, t.paid_at "paidAt", t.subscription_id "subscriptionId", t.updated_at "transactionUpdatedAt", t.created_at "transactionCreatedAt", t.deleted_at "transactionDeletedAt"
-    FROM wallets w
+      COALESCE(SUM(t.amount), 0) AS "spendingPeriodTotal"
+      FROM wallets w
     LEFT JOIN transactions t
     ON (t.wallet_id = w.id OR t.wallet_id IN (SELECT id FROM wallets WHERE sub_wallet_of = w.id))
     AND (
       CASE 
-        WHEN w.spending_period = 'DAY'   THEN t.created_at AT TIME ZONE ${timezone} >= NOW() AT TIME ZONE ${timezone}
-        WHEN w.spending_period = 'WEEK'  THEN t.created_at AT TIME ZONE ${timezone} >= DATE_TRUNC('week', NOW() AT TIME ZONE ${timezone})
-        WHEN w.spending_period = 'MONTH' THEN t.created_at AT TIME ZONE ${timezone} >= DATE_TRUNC('month', NOW() AT TIME ZONE ${timezone})
-        WHEN w.spending_period = 'YEAR'  THEN t.created_at AT TIME ZONE ${timezone} >= DATE_TRUNC('year', NOW() AT TIME ZONE ${timezone})
+        WHEN w.spending_period = 'DAY'   THEN t.paid_at AT TIME ZONE ${timezone} >= NOW() AT TIME ZONE ${timezone}
+        WHEN w.spending_period = 'WEEK'  THEN t.paid_at AT TIME ZONE ${timezone} >= DATE_TRUNC('week', NOW() AT TIME ZONE ${timezone})
+        WHEN w.spending_period = 'MONTH' THEN t.paid_at AT TIME ZONE ${timezone} >= DATE_TRUNC('month', NOW() AT TIME ZONE ${timezone})
+        WHEN w.spending_period = 'YEAR'  THEN t.paid_at AT TIME ZONE ${timezone} >= DATE_TRUNC('year', NOW() AT TIME ZONE ${timezone})
         WHEN w.spending_period = 'ALL'   THEN TRUE
       END
     )
     where w.user_id = ${userId}
-    order by w.order_index asc, t.paid_at desc
+    GROUP BY w.id
+    order by w.order_index asc
     `)
 
   return (await result).rows
