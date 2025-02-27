@@ -66,4 +66,5 @@ export type GetDashboardWalletsResponse = z.infer<
 >
 export type GetWalletsRequest = z.infer<typeof GetWalletsRequestSchema>
 export type GetWalletsResponse = z.infer<typeof GetWalletsResponseSchema>
+export type Transaction = z.infer<typeof TransactionSchema>
 export type Wallet = z.infer<typeof WalletSchema>
