@@ -68,6 +68,28 @@ export const getAllDashboardWallets = async (
   for (const transactions of Object.values(transactionsByWalletId)) {
     if (!transactions) continue
 
+    let spendingPeriodTotal = 0
+    const walletTransactions = []
+
+    for (const transaction of transactions) {
+      if (transaction.transactionId === null) break
+
+      spendingPeriodTotal += parseFloat(transaction.amount)
+
+      walletTransactions.push({
+        id: transaction.transactionId,
+        walletId: transaction.walletId,
+        amount: transaction.amount,
+        category: transaction.category,
+        description: transaction.description,
+        paidAt: transaction.paidAt,
+        subscriptionId: transaction.subscriptionId,
+        updatedAt: transaction.transactionUpdatedAt,
+        createdAt: transaction.transactionCreatedAt,
+        deletedAt: transaction.transactionDeletedAt,
+      })
+    }
+
     responseBody.push({
       id: transactions[0].id,
       userId: transactions[0].userId,
@@ -81,21 +103,8 @@ export const getAllDashboardWallets = async (
       updatedAt: transactions[0].updatedAt,
       createdAt: transactions[0].createdAt,
       deletedAt: transactions[0].deletedAt,
-      transactions:
-        transactions[0].transactionId !== null
-          ? transactions.map((r) => ({
-              id: r.transactionId,
-              walletId: r.walletId,
-              amount: r.amount,
-              category: r.category,
-              description: r.description,
-              paidAt: r.paidAt,
-              subscriptionId: r.subscriptionId,
-              updatedAt: r.transactionUpdatedAt,
-              createdAt: r.transactionCreatedAt,
-              deletedAt: r.transactionDeletedAt,
-            }))
-          : [],
+      spendingPeriodTotal,
+      transactions: walletTransactions,
     })
   }
 
