@@ -38,7 +38,7 @@ const WalletSchema = z.object({
 
 const WalletWithSpendingPeriodTotalSchema = WalletSchema.merge(
   z.object({
-    spendingPeriodTotal: z.string(),
+    spendingPeriodTotal: z.number(),
   })
 )
 
@@ -47,7 +47,7 @@ export const CreateTransactionRequestSchema = z.object({
   amount: z.number(),
   category: z.nativeEnum(Category),
   description: z.string(),
-  paidAt: z.string(),
+  paidAt: z.string().optional(),
 })
 
 export const CreateWalletRequestSchema = z.object({

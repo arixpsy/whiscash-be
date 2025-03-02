@@ -1,11 +1,10 @@
 import {
+  doublePrecision,
   index,
   integer,
-  numeric,
-  pgTable,
   pgEnum,
+  pgTable,
   timestamp,
-  uuid,
   varchar,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
@@ -64,10 +63,10 @@ export const transactionsTable = pgTable(
     walletId: integer()
       .references(() => walletsTable.id)
       .notNull(),
-    amount: numeric({ precision: 12, scale: 2 }).notNull(),
+    amount: doublePrecision().notNull(),
     category: categoryEnum('category').default(Category.Others),
     description: varchar({ length: 255 }).notNull(),
-    paidAt: timestamp().notNull(),
+    paidAt: timestamp().defaultNow().notNull(),
     subscriptionId: integer(),
     ...timestamps,
   },
