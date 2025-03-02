@@ -1,6 +1,8 @@
-import { and, asc, eq, ilike, isNull, type SQL } from 'drizzle-orm'
+import { and, desc, eq, ilike, isNull, type SQL } from 'drizzle-orm'
 import { transactionsTable, walletsTable } from '@/db/schema'
 import { db } from '@/utils/db'
+
+type NewTransaction = typeof transactionsTable.$inferInsert
 
 const transactionResponse = {
   id: transactionsTable.id,
@@ -25,7 +27,7 @@ const DescriptionLike = (searchPhrase: string) =>
   ilike(transactionsTable.description, `%${searchPhrase}%`)
 
 // Sort Values
-const SortByPaidAt = asc(transactionsTable.paidAt)
+const SortByPaidAt = desc(transactionsTable.paidAt)
 
 const getTransactions = (filters: Array<SQL>, sortBy: SQL) => {
   return db
@@ -39,8 +41,18 @@ const getTransactions = (filters: Array<SQL>, sortBy: SQL) => {
 const getTransactionsByWalletId = (walletId: number) =>
   getTransactions([WallletIdEqualTo(walletId), DeletedAtAtIsNull], SortByPaidAt)
 
+const insertTransaction = async (transaction: NewTransaction) => {
+  const transactions = await db
+    .insert(transactionsTable)
+    .values(transaction)
+    .returning()
+
+  return transactions[0]
+}
+
 const transactionDAO = {
   getTransactionsByWalletId,
+  insertTransaction,
 }
 
 export default transactionDAO

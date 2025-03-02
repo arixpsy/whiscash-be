@@ -1,13 +1,37 @@
-import type { Request, Response } from 'express'
-import type { TypedRequestQuery } from 'zod-express-middleware'
-import type { GetTransactionRequestSchema } from '@/@types/shared'
+import type { Response } from 'express'
+import type {
+  TypedRequestBody,
+  TypedRequestQuery,
+} from 'zod-express-middleware'
+import type {
+  CreateTransactionRequestSchema,
+  GetTransactionRequestSchema,
+} from '@/@types/shared'
 import transactionDAO from '@/dao/transactionDAO'
 import response from '@/utils/response'
 
-export const createTransaction = (req: Request, res: Response) => {
-  res.status(200).json({
-    message: 'transaction created',
+export const createTransaction = async (
+  req: TypedRequestBody<typeof CreateTransactionRequestSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { amount, category, description, walletId } = req.body
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  // TODO: check walletId belong to userId
+
+  const newTransaction = await transactionDAO.insertTransaction({
+    amount,
+    category,
+    description,
+    walletId,
   })
+
+  response.created(res, newTransaction)
 }
 
 export const getTransactionsByWalletId = async (

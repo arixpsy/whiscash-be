@@ -1,10 +1,16 @@
 import { Router } from 'express'
 import {
+  validateRequestBody,
+  validateRequestQuery,
+} from 'zod-express-middleware'
+import {
+  CreateTransactionRequestSchema,
+  GetTransactionRequestSchema,
+} from '@/@types/shared'
+import {
   createTransaction,
   getTransactionsByWalletId,
 } from '@/controllers/transaction'
-import { validateRequestQuery } from 'zod-express-middleware'
-import { GetTransactionRequestSchema } from '@/@types/shared'
 
 const transactionRoutes = Router()
 
@@ -13,6 +19,10 @@ transactionRoutes.get(
   validateRequestQuery(GetTransactionRequestSchema),
   getTransactionsByWalletId
 )
-transactionRoutes.post('/', createTransaction)
+transactionRoutes.post(
+  '/',
+  validateRequestBody(CreateTransactionRequestSchema),
+  createTransaction
+)
 
 export default transactionRoutes
