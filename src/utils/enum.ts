@@ -13,6 +13,7 @@ export const Category = {
   Entertainment: 'ENTERTAINMENT',
   Fitness: 'FITNESS',
   Food: 'FOOD',
+  Games: 'GAMES',
   Gifts: 'GIFTS',
   Hobbies: 'HOBBIES',
   Insurance: 'INSURANCE',
