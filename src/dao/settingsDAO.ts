@@ -21,7 +21,7 @@ const getUserTimezoneAndCreateIfNull = async (
     .where(UserIdEqualTo(userId))
 
   if (settingsResult.length === 0) {
-    db.insert(settingsTable).values({
+    await db.insert(settingsTable).values({
       userId,
       timezone,
     })
