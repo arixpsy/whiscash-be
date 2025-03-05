@@ -39,17 +39,26 @@ export const getTransactionsByWalletId = async (
   res: Response
 ) => {
   const { userId } = req.auth
-  const { walletId } = req.query
+  const { walletId, limit, offset } = req.query
 
   if (!userId) {
     response.unauthorized(res)
     return
   }
 
+  if (!walletId) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Wallet id not specified',
+    })
+  }
+
   // TODO: check walletId belong to userId
 
   const walletTransactions = await transactionDAO.getTransactionsByWalletId(
-    parseInt(walletId as unknown as string)
+    parseInt(walletId),
+    limit ? parseInt(limit) : 10,
+    offset ? parseInt(offset) : 0
   )
 
   response.ok(res, walletTransactions)

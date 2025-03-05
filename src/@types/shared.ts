@@ -66,8 +66,11 @@ export const GetDashboardWalletsResponse = z.array(
   WalletWithSpendingPeriodTotalSchema
 )
 
+// Values are string typed due to search params
 export const GetTransactionRequestSchema = z.object({
   walletId: z.string(),
+  limit: z.string(),
+  offset: z.string().optional(),
 })
 
 export const GetTransactionsResponseSchema = z.array(
