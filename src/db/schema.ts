@@ -66,7 +66,7 @@ export const transactionsTable = pgTable(
     amount: doublePrecision().notNull(),
     category: categoryEnum('category').default(Category.Others),
     description: varchar({ length: 255 }).notNull(),
-    paidAt: timestamp().defaultNow().notNull(),
+    paidAt: timestamp({ mode: "string" }).defaultNow().notNull(),
     subscriptionId: integer(),
     ...timestamps,
   },
