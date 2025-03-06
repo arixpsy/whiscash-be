@@ -20,6 +20,8 @@ const transactionResponse = {
 }
 
 // Filter Conditions
+const TransactionIdEqualTo = (transactionId: number) =>
+  eq(transactionsTable.id, transactionId)
 const WallletIdEqualTo = (walletId: number) =>
   eq(transactionsTable.walletId, walletId)
 const DeletedAtAtIsNull = isNull(transactionsTable.deletedAt)
@@ -28,6 +30,15 @@ const DescriptionLike = (searchPhrase: string) =>
 
 // Sort Values
 const SortByPaidAt = desc(transactionsTable.paidAt)
+
+const deleteTransaction = async (transactionId: number) => {
+  const deletedTransaction = await db
+    .delete(transactionsTable)
+    .where(TransactionIdEqualTo(transactionId))
+    .returning()
+
+  return deletedTransaction[0]
+}
 
 const getTransactions = (
   filters: Array<SQL>,
@@ -67,6 +78,7 @@ const insertTransaction = async (transaction: NewTransaction) => {
 }
 
 const transactionDAO = {
+  deleteTransaction,
   getTransactionsByWalletId,
   insertTransaction,
 }
