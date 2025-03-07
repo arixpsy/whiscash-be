@@ -12,6 +12,8 @@ type NewWallet = typeof walletsTable.$inferInsert
 const UserIdEqualTo = (userId: string) => eq(walletsTable.userId, userId)
 const CurrencyEqualTo = (currency: string) =>
   eq(walletsTable.currency, currency)
+const SubWalletofEqualTo = (walletId: number) =>
+  eq(walletsTable.subWalletOf, walletId)
 const SubWalletofIsNull = isNull(walletsTable.subWalletOf)
 const ArchivedAtIsNull = isNull(walletsTable.archivedAt)
 const DeletedAtAtIsNull = isNull(walletsTable.deletedAt)
@@ -83,6 +85,12 @@ const getAllMainWallets = (
     SortByCreatedAt
   )
 
+const getWalletSubWallets = (walletId: number) =>
+  db
+    .select()
+    .from(walletsTable)
+    .where(and(SubWalletofEqualTo(walletId), DeletedAtAtIsNull))
+
 const insertWallet = async (wallet: NewWallet) => {
   const userWalletCount = db.$with('user_wallet_count').as(
     db
@@ -107,6 +115,7 @@ const walletDAO = {
   getAllDashboardWallets,
   getAllWallets,
   getAllMainWallets,
+  getWalletSubWallets,
   insertWallet,
 }
 

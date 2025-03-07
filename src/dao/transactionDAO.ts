@@ -1,4 +1,5 @@
-import { and, desc, eq, ilike, isNull, type SQL } from 'drizzle-orm'
+import { and, desc, eq, ilike, inArray, isNull, type SQL } from 'drizzle-orm'
+import walletDAO from '@/dao/walletDAO'
 import { transactionsTable, walletsTable } from '@/db/schema'
 import { db } from '@/utils/db'
 
@@ -24,6 +25,8 @@ const TransactionIdEqualTo = (transactionId: number) =>
   eq(transactionsTable.id, transactionId)
 const WallletIdEqualTo = (walletId: number) =>
   eq(transactionsTable.walletId, walletId)
+const WalletIdIn = (walletIds: Array<number>) =>
+  inArray(transactionsTable.walletId, walletIds)
 const DeletedAtAtIsNull = isNull(transactionsTable.deletedAt)
 const DescriptionLike = (searchPhrase: string) =>
   ilike(transactionsTable.description, `%${searchPhrase}%`)
@@ -56,17 +59,22 @@ const getTransactions = (
     .offset(offset ? offset : 0)
 }
 
-const getTransactionsByWalletId = (
+const getTransactionsByWalletId = async (
   walletId: number,
   limit: number,
   offset?: number
-) =>
-  getTransactions(
-    [WallletIdEqualTo(walletId), DeletedAtAtIsNull],
+) => {
+  const subWalletIds = (await walletDAO.getWalletSubWallets(walletId)).map(
+    (r) => r.id
+  )
+
+  return getTransactions(
+    [WalletIdIn([walletId, ...subWalletIds]), DeletedAtAtIsNull],
     SortByPaidAt,
     limit,
     offset
   )
+}
 
 const insertTransaction = async (transaction: NewTransaction) => {
   const transactions = await db
