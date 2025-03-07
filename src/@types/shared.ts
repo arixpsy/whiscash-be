@@ -14,10 +14,11 @@ const TransactionSchema = z.object({
   deletedAt: z.string().nullable(),
 })
 
-const TransactionWithCurrencySchema = TransactionSchema.merge(
+const TransactionWithWalletSchema = TransactionSchema.merge(
   z.object({
     currency: z.string(),
     country: z.string(),
+    subWalletOf: z.number().nullable(),
   })
 )
 
@@ -74,7 +75,7 @@ export const GetTransactionRequestSchema = z.object({
 })
 
 export const GetTransactionsResponseSchema = z.array(
-  TransactionWithCurrencySchema
+  TransactionWithWalletSchema
 )
 
 export const GetWalletsRequestSchema = z.object({
@@ -101,8 +102,8 @@ export type GetTransactionsResponse = z.infer<
 export type GetWalletsRequest = z.infer<typeof GetWalletsRequestSchema>
 export type GetWalletsResponse = z.infer<typeof GetWalletsResponseSchema>
 export type Transaction = z.infer<typeof TransactionSchema>
-export type TransactionWithCurrency = z.infer<
-  typeof TransactionWithCurrencySchema
+export type TransactionWithWallet = z.infer<
+  typeof TransactionWithWalletSchema
 >
 export type Wallet = z.infer<typeof WalletSchema>
 export type WalletWithSpendingPeriodTotal = z.infer<

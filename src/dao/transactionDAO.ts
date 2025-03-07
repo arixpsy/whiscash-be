@@ -18,6 +18,7 @@ const transactionResponse = {
   deletedAt: transactionsTable.deletedAt,
   country: walletsTable.country,
   currency: walletsTable.currency,
+  subWalletOf: walletsTable.subWalletOf
 }
 
 // Filter Conditions
