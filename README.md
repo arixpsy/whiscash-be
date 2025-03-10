@@ -21,7 +21,7 @@ Whiscash is a personal finance tracking application backend API built with Expre
 - **Authentication**: Clerk
 - **Logging**: Consola, Morgan
 - **Schema Validation**: Zod
-- **Development Tools**: 
+- **Development Tools**:
   - TSX for TypeScript execution
   - Prettier for code formatting
   - Simple Git Hooks for pre-commit checks
@@ -58,17 +58,20 @@ whiscash-be/
 ### Installation
 
 1. Clone the repository
+
    ```
    git clone https://github.com/yourusername/whiscash-be.git
    cd whiscash-be
    ```
 
 2. Install dependencies
+
    ```
    yarn install
    ```
 
 3. Create a `.env` file in the root directory with the following variables:
+
    ```
    PORT=9000
    DATABASE_URL=your_postgres_connection_string
@@ -77,6 +80,7 @@ whiscash-be/
    ```
 
 4. Generate database schema
+
    ```
    yarn drizzle-kit generate
    ```
@@ -89,9 +93,11 @@ whiscash-be/
 ## API Endpoints
 
 ### Health Check
+
 - `GET /healthcheck` - Check if the server is running
 
 ### Wallets
+
 - `GET /api/wallet` - Get all wallets for the authenticated user with optional filtering
 - `GET /api/wallet/dashboard` - Get all wallets for dashboard view
 - `GET /api/wallet/main` - Get all main wallets (not sub-wallets)
@@ -99,6 +105,7 @@ whiscash-be/
 - `POST /api/wallet` - Create a new wallet
 
 ### Transactions
+
 - `GET /api/transaction` - Get transactions by wallet ID (via query parameter)
 - `POST /api/transaction` - Create a new transaction
 - `DELETE /api/transaction/:transactionId` - Delete a transaction
@@ -114,6 +121,7 @@ whiscash-be/
 ## Database Schema
 
 ### Wallets
+
 - id (Primary Key)
 - userId (from Clerk)
 - name
@@ -126,6 +134,7 @@ whiscash-be/
 - timestamps (createdAt, updatedAt, deletedAt)
 
 ### Transactions
+
 - id (Primary Key)
 - walletId (Foreign Key to Wallet)
 - amount
@@ -141,4 +150,4 @@ ISC License - See LICENSE file for details
 
 ## Author
 
-Arix Phua 
+Arix Phua
