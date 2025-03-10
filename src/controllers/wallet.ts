@@ -126,7 +126,7 @@ export const getWallet = async (
 
   // TODO: check of wallet belong to user
 
-  const userWallets = await walletDAO.getWallet(walletIdInt)
+  const userWallet = await walletDAO.getWallet(walletIdInt)
 
-  response.ok(res, userWallets)
+  response.ok(res, userWallet)
 }

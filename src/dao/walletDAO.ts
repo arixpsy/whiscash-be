@@ -25,11 +25,14 @@ const NameLike = (searchPhrase: string) =>
 const SortByOrderIndex = asc(walletsTable.orderIndex)
 const SortByCreatedAt = asc(walletsTable.createdAt)
 
-const getWallet = (walletId: number) =>
-  db
+const getWallet = async (walletId: number) => {
+  const wallets = await db
     .select()
     .from(walletsTable)
     .where(and(WalletIdEqualTo(walletId), DeletedAtAtIsNull))
+
+  return wallets[0]
+}
 
 const getWallets = (filters: Array<SQL>, sortBy: SQL) =>
   db
