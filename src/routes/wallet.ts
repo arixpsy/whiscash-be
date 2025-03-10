@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   validateRequestBody,
+  validateRequestParams,
   validateRequestQuery,
 } from 'zod-express-middleware'
 import {
@@ -8,12 +9,14 @@ import {
   getAllWallets,
   getAllDashboardWallets,
   getAllMainWallets,
+  getWallet,
 } from '@/controllers/wallet'
 import {
   CreateWalletRequestSchema,
   GetDashboardWalletsRequest,
   GetWalletsRequestSchema,
 } from '@/@types/shared'
+import { WalletIdParamsSchema } from '@/@types/wallets'
 
 const walletRoutes = Router()
 
@@ -31,6 +34,11 @@ walletRoutes.get(
   '/main',
   validateRequestQuery(GetWalletsRequestSchema),
   getAllMainWallets
+)
+walletRoutes.get(
+  '/:walletId',
+  validateRequestParams(WalletIdParamsSchema),
+  getWallet
 )
 walletRoutes.post(
   '/',

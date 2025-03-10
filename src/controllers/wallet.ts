@@ -1,14 +1,15 @@
 import { type Request, type Response } from 'express'
 import type {
   TypedRequestBody,
+  TypedRequestParams,
   TypedRequestQuery,
 } from 'zod-express-middleware'
 import { CreateWalletRequestSchema } from '@/@types/shared'
 import {
   GetDashboardWalletsRequest,
   GetWalletsRequestSchema,
-  type GetDashboardWalletsResponse,
 } from '@/@types/shared'
+import type { WalletIdParamsSchema } from '@/@types/wallets'
 import settingsDAO from '@/dao/settingsDAO'
 import walletDAO from '@/dao/walletDAO'
 import response from '@/utils/response'
@@ -95,6 +96,37 @@ export const getAllWallets = async (
   }
 
   const userWallets = await walletDAO.getAllWallets(userId, { searchPhrase })
+
+  response.ok(res, userWallets)
+}
+
+export const getWallet = async (
+  req: TypedRequestParams<typeof WalletIdParamsSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { walletId } = req.params
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  let walletIdInt = 0
+
+  try {
+    walletIdInt = parseInt(walletId)
+  } catch (e) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid wallet id',
+    })
+    return
+  }
+
+  // TODO: check of wallet belong to user
+
+  const userWallets = await walletDAO.getWallet(walletIdInt)
 
   response.ok(res, userWallets)
 }

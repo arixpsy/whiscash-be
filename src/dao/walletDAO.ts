@@ -14,6 +14,7 @@ const CurrencyEqualTo = (currency: string) =>
   eq(walletsTable.currency, currency)
 const SubWalletofEqualTo = (walletId: number) =>
   eq(walletsTable.subWalletOf, walletId)
+const WalletIdEqualTo = (walletId: number) => eq(walletsTable.id, walletId)
 const SubWalletofIsNull = isNull(walletsTable.subWalletOf)
 const ArchivedAtIsNull = isNull(walletsTable.archivedAt)
 const DeletedAtAtIsNull = isNull(walletsTable.deletedAt)
@@ -24,13 +25,18 @@ const NameLike = (searchPhrase: string) =>
 const SortByOrderIndex = asc(walletsTable.orderIndex)
 const SortByCreatedAt = asc(walletsTable.createdAt)
 
-const getWallets = (filters: Array<SQL>, sortBy: SQL) => {
-  return db
+const getWallet = (walletId: number) =>
+  db
+    .select()
+    .from(walletsTable)
+    .where(and(WalletIdEqualTo(walletId), DeletedAtAtIsNull))
+
+const getWallets = (filters: Array<SQL>, sortBy: SQL) =>
+  db
     .select()
     .from(walletsTable)
     .where(and(...filters))
     .orderBy(sortBy)
-}
 
 const getAllDashboardWallets = async (userId: string, timezone: string) => {
   const result: PgRaw<NeonHttpQueryResult<RawWalletAndSpendingPeriodTotal>> =
@@ -115,6 +121,7 @@ const walletDAO = {
   getAllDashboardWallets,
   getAllWallets,
   getAllMainWallets,
+  getWallet,
   getWalletSubWallets,
   insertWallet,
 }
