@@ -18,6 +18,7 @@ const transactionResponse = {
   deletedAt: transactionsTable.deletedAt,
   country: walletsTable.country,
   currency: walletsTable.currency,
+  name: walletsTable.name,
   subWalletOf: walletsTable.subWalletOf,
 }
 

@@ -18,6 +18,7 @@ const TransactionWithWalletSchema = TransactionSchema.merge(
   z.object({
     currency: z.string(),
     country: z.string(),
+    name: z.string(),
     subWalletOf: z.number().nullable(),
   })
 )
