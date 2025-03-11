@@ -44,6 +44,16 @@ const deleteTransaction = async (transactionId: number) => {
   return deletedTransaction[0]
 }
 
+const getTransactionById = async (transactionId: number) => {
+  const transaction = await db
+    .select(transactionResponse)
+    .from(transactionsTable)
+    .innerJoin(walletsTable, eq(transactionsTable.walletId, walletsTable.id))
+    .where(TransactionIdEqualTo(transactionId))
+
+  return transaction[0]
+}
+
 const getTransactions = (
   filters: Array<SQL>,
   sortBy: SQL,
@@ -88,6 +98,7 @@ const insertTransaction = async (transaction: NewTransaction) => {
 
 const transactionDAO = {
   deleteTransaction,
+  getTransactionById,
   getTransactionsByWalletId,
   insertTransaction,
 }

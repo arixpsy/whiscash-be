@@ -100,7 +100,7 @@ export const getAllWallets = async (
   response.ok(res, userWallets)
 }
 
-export const getWallet = async (
+export const getWalletById = async (
   req: TypedRequestParams<typeof WalletIdParamsSchema>,
   res: Response
 ) => {
@@ -124,9 +124,15 @@ export const getWallet = async (
     return
   }
 
-  // TODO: check of wallet belong to user
+  const wallet = await walletDAO.getWallet(walletIdInt)
 
-  const userWallet = await walletDAO.getWallet(walletIdInt)
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description: 'You do not have permission to view this wallet',
+    })
+    return
+  }
 
-  response.ok(res, userWallet)
+  response.ok(res, wallet)
 }

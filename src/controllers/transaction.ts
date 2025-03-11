@@ -10,6 +10,7 @@ import type {
 } from '@/@types/shared'
 import type { TransactionIdParamsSchema } from '@/@types/transactions'
 import transactionDAO from '@/dao/transactionDAO'
+import walletDAO from '@/dao/walletDAO'
 import response from '@/utils/response'
 
 export const createTransaction = async (
@@ -24,7 +25,16 @@ export const createTransaction = async (
     return
   }
 
-  // TODO: check walletId belong to userId
+  const wallet = await walletDAO.getWallet(walletId)
+
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description:
+        'You do not have permission to add transactions to this wallet',
+    })
+    return
+  }
 
   const newTransaction = await transactionDAO.insertTransaction({
     amount,
@@ -60,7 +70,25 @@ export const deleteTransaction = async (
     return
   }
 
-  // TODO: check of transaction/wallet belong to user
+  const transaction = await transactionDAO.getTransactionById(transactionIdInt)
+
+  if (!transaction) {
+    response.notFound(res, {
+      message: 'Not found',
+      description: 'Transaction not found',
+    })
+    return
+  }
+
+  const wallet = await walletDAO.getWallet(transaction.walletId)
+
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description: 'You do not have permission to delete this transaction',
+    })
+    return
+  }
 
   const deletedTransaction =
     await transactionDAO.deleteTransaction(transactionIdInt)
@@ -87,7 +115,28 @@ export const getTransactionsByWalletId = async (
     })
   }
 
-  // TODO: check walletId belong to userId
+  let walletIdInt = 0
+
+  try {
+    walletIdInt = parseInt(walletId)
+  } catch (e) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid wallet id',
+    })
+    return
+  }
+
+  const wallet = await walletDAO.getWallet(walletIdInt)
+
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description:
+        'You do not have permission to view transactions of this wallet',
+    })
+    return
+  }
 
   const walletTransactions = await transactionDAO.getTransactionsByWalletId(
     parseInt(walletId),
@@ -96,4 +145,33 @@ export const getTransactionsByWalletId = async (
   )
 
   response.ok(res, walletTransactions)
+}
+
+export const getTransactionById = async (
+  req: TypedRequestParams<typeof TransactionIdParamsSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { transactionId } = req.params
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  let transactionIdInt = 0
+
+  try {
+    transactionIdInt = parseInt(transactionId)
+  } catch (e) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid transaction id',
+    })
+    return
+  }
+
+  const transaction = await transactionDAO.getTransactionById(transactionIdInt)
+
+  response.ok(res, transaction)
 }

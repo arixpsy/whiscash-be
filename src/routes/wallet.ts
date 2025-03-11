@@ -9,7 +9,7 @@ import {
   getAllWallets,
   getAllDashboardWallets,
   getAllMainWallets,
-  getWallet,
+  getWalletById,
 } from '@/controllers/wallet'
 import {
   CreateWalletRequestSchema,
@@ -38,7 +38,7 @@ walletRoutes.get(
 walletRoutes.get(
   '/:walletId',
   validateRequestParams(WalletIdParamsSchema),
-  getWallet
+  getWalletById
 )
 walletRoutes.post(
   '/',
