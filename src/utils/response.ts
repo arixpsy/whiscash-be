@@ -27,6 +27,7 @@ const response = {
   created: buildSuccessResponse(201),
   badRequest: buildErrorResponse(400),
   unauthorized: buildUnauthorizedResponse,
+  forbidden: buildErrorResponse(403),
   notFound: buildErrorResponse(404),
   tooManyRequest: buildErrorResponse(429),
   internalServerError: buildErrorResponse(500),
