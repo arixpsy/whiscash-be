@@ -12,7 +12,7 @@ const Middleware: Record<string, Handler> = {
   morgan: morgan('tiny'),
   rateLimit: rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 100,
+    limit: 500,
     handler: (req, res) => {
       consola.warn(`DDoS Attempt from ${req.ip}`)
 
