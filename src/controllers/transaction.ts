@@ -173,5 +173,13 @@ export const getTransactionById = async (
 
   const transaction = await transactionDAO.getTransactionById(transactionIdInt)
 
+  if (!transaction) {
+    response.notFound(res, {
+      message: 'Not found',
+      description: 'Transaction not found',
+    })
+    return
+  }
+
   response.ok(res, transaction)
 }
