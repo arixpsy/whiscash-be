@@ -18,7 +18,7 @@ export const createTransaction = async (
   res: Response
 ) => {
   const { userId } = req.auth
-  const { amount, category, description, walletId } = req.body
+  const { amount, category, description, walletId, paidAt } = req.body
 
   if (!userId) {
     response.unauthorized(res)
@@ -41,6 +41,7 @@ export const createTransaction = async (
     category,
     description,
     walletId,
+    paidAt,
   })
 
   response.created(res, newTransaction)
