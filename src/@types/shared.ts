@@ -79,6 +79,19 @@ export const GetTransactionsResponseSchema = z.array(
   TransactionWithWalletSchema
 )
 
+export const GetWalletChartDataRequestSchema = z.object({
+  unit: z.nativeEnum(SpendingPeriod),
+  limit: z.string(),
+  offset: z.string().optional(),
+})
+
+export const GetWalletChartDataResponseSchema = z.array(
+  z.object({
+    startPeriod: z.string(),
+    spendingPeriodTotal: z.number(),
+    transactions: z.array(TransactionSchema),
+  })
+)
 export const GetWalletsRequestSchema = z.object({
   searchPhrase: z.string().optional(),
   currency: z.string().length(3).optional(),

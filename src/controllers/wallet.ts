@@ -4,7 +4,10 @@ import type {
   TypedRequestParams,
   TypedRequestQuery,
 } from 'zod-express-middleware'
-import { CreateWalletRequestSchema } from '@/@types/shared'
+import {
+  CreateWalletRequestSchema,
+  GetWalletChartDataRequestSchema,
+} from '@/@types/shared'
 import {
   GetDashboardWalletsRequest,
   GetWalletsRequestSchema,
@@ -13,6 +16,7 @@ import type { WalletIdParamsSchema } from '@/@types/wallets'
 import settingsDAO from '@/dao/settingsDAO'
 import walletDAO from '@/dao/walletDAO'
 import response from '@/utils/response'
+import transactionDAO from '@/dao/transactionDAO'
 
 export const createWallet = async (
   req: TypedRequestBody<typeof CreateWalletRequestSchema>,
@@ -135,4 +139,47 @@ export const getWalletById = async (
   }
 
   response.ok(res, wallet)
+}
+
+export const getWalletChartData = async (
+  req: TypedRequestQuery<typeof GetWalletChartDataRequestSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { walletId } = req.params
+  const { unit, limit, offset } = req.query
+
+  let walletIdInt = 0
+
+  try {
+    walletIdInt = parseInt(walletId)
+  } catch (e) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid wallet id',
+    })
+    return
+  }
+
+  const wallet = await walletDAO.getWallet(walletIdInt)
+
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description: 'You do not have permission to view this wallet',
+    })
+    return
+  }
+
+  const currentTimezone = await settingsDAO.getUserTimezone(userId)
+
+  const chartData = await transactionDAO.getWalletChartData(
+    walletIdInt,
+    currentTimezone,
+    unit,
+    limit ? parseInt(limit) : 10,
+    offset ? parseInt(offset) : 0
+  )
+
+  response.ok(res, chartData)
 }

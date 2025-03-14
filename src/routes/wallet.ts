@@ -10,10 +10,12 @@ import {
   getAllDashboardWallets,
   getAllMainWallets,
   getWalletById,
+  getWalletChartData,
 } from '@/controllers/wallet'
 import {
   CreateWalletRequestSchema,
   GetDashboardWalletsRequest,
+  GetWalletChartDataRequestSchema,
   GetWalletsRequestSchema,
 } from '@/@types/shared'
 import { WalletIdParamsSchema } from '@/@types/wallets'
@@ -39,6 +41,12 @@ walletRoutes.get(
   '/:walletId',
   validateRequestParams(WalletIdParamsSchema),
   getWalletById
+)
+walletRoutes.get(
+  '/:walletId/chart',
+  validateRequestParams(WalletIdParamsSchema),
+  validateRequestQuery(GetWalletChartDataRequestSchema),
+  getWalletChartData
 )
 walletRoutes.post(
   '/',

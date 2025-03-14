@@ -1,3 +1,5 @@
+import type { NeonHttpQueryResult } from 'drizzle-orm/neon-http'
+import type { PgRaw } from 'drizzle-orm/pg-core/query-builders/raw'
 import {
   and,
   desc,
@@ -8,9 +10,11 @@ import {
   sql,
   type SQL,
 } from 'drizzle-orm'
+import type { RawWalletChartData } from '@/@types/transactions'
 import walletDAO from '@/dao/walletDAO'
 import { transactionsTable, walletsTable } from '@/db/schema'
 import { db } from '@/utils/db'
+import type { SpendingPeriod } from '@/utils/enum'
 
 type NewTransaction = typeof transactionsTable.$inferInsert
 
@@ -97,6 +101,52 @@ const getTransactionsByWalletId = async (
   )
 }
 
+const getWalletChartData = async (
+  walletId: number,
+  timezone: string,
+  unit: SpendingPeriod,
+  limit: number,
+  offset: number
+) => {
+  const result: PgRaw<NeonHttpQueryResult<RawWalletChartData>> = db.execute(sql`
+    WITH date_ranges AS (
+      SELECT generate_series(
+        DATE_TRUNC('${unit}', NOW() AT TIME ZONE '${timezone}') - INTERVAL '${limit + offset} ${unit}', 
+        DATE_TRUNC('${unit}', NOW() AT TIME ZONE '${timezone}') - INTERVAL '${offset} ${unit}', 
+        INTERVAL '1 ${unit}'
+      ) AS "startPeriod"
+    )
+
+    SELECT 
+      d."startPeriod", 
+      COALESCE(ROUND(SUM(t.amount)::NUMERIC, 2), 0) AS "spendingPeriodTotal", 
+      json_agg(
+        jsonb_build_object(
+          'id', t.id,
+          'walletId', t.wallet_id,
+          'amount', t.amount,
+          'category', t.category,
+          'description', t.description,
+          'paidAt', t.paid_at,
+          'subscriptionId', t.subscription_id,
+          'createdAt', t.created_at,
+          'updatedAt', t.updated_at,
+          'deletedAt', t.deleted_at
+        )
+      ) FILTER (WHERE t.id IS NOT NULL) AS transactions
+    FROM date_ranges d
+    LEFT JOIN transactions t
+    ON (t.wallet_id = ${walletId} OR t.wallet_id IN (SELECT id FROM wallets WHERE sub_wallet_of = ${walletId})) 
+    AND t.paid_at >= d."startPeriod" AT TIME ZONE '${timezone}'
+    AND t.paid_at < (d."startPeriod" + INTERVAL '1 ${unit}') AT TIME ZONE '${timezone}'
+    GROUP BY d."startPeriod"
+    ORDER BY d."startPeriod" DESC
+    LIMIT ${limit} OFFSET ${offset};
+  `)
+
+  return result
+}
+
 const insertTransaction = async (transaction: NewTransaction) => {
   const transactions = await db
     .insert(transactionsTable)
@@ -129,6 +179,7 @@ const transactionDAO = {
   deleteTransaction,
   getTransactionById,
   getTransactionsByWalletId,
+  getWalletChartData,
   insertTransaction,
   updateTransaction,
 }
