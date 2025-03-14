@@ -7,7 +7,7 @@ import type {
 import type {
   CreateTransactionRequestSchema,
   GetTransactionRequestSchema,
-  UpdateTransactionRequest,
+  UpdateTransactionRequestSchema,
 } from '@/@types/shared'
 import type { TransactionIdParamsSchema } from '@/@types/transactions'
 import transactionDAO from '@/dao/transactionDAO'
@@ -187,13 +187,12 @@ export const getTransactionById = async (
 }
 
 export const updateTransaction = async (
-  req: TypedRequestParams<typeof TransactionIdParamsSchema>,
+  req: TypedRequestQuery<typeof UpdateTransactionRequestSchema>,
   res: Response
 ) => {
   const { userId } = req.auth
   const { transactionId } = req.params
-  const { amount, category, description, walletId, paidAt } =
-    req.body as UpdateTransactionRequest
+  const { amount, category, description, walletId, paidAt } = req.body
 
   if (!userId) {
     response.unauthorized(res)
