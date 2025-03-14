@@ -11,6 +11,19 @@ const SettingsResponse = {
 // Filter Conditions
 const UserIdEqualTo = (userId: string) => eq(settingsTable.userId, userId)
 
+const getUserTimezone = async (userId: string) => {
+  const settingsResult = await db
+    .select(SettingsResponse)
+    .from(settingsTable)
+    .where(UserIdEqualTo(userId))
+
+  if (settingsResult.length === 0) {
+    return 'UTC'
+  }
+
+  return settingsResult[0].timezone
+}
+
 const getUserTimezoneAndCreateIfNull = async (
   userId: string,
   timezone: string
@@ -32,6 +45,7 @@ const getUserTimezoneAndCreateIfNull = async (
 }
 
 const settingsDAO = {
+  getUserTimezone,
   getUserTimezoneAndCreateIfNull,
 }
 
