@@ -7,6 +7,7 @@ import type {
 import type {
   CreateTransactionRequestSchema,
   GetTransactionRequestSchema,
+  UpdateTransactionRequest,
 } from '@/@types/shared'
 import type { TransactionIdParamsSchema } from '@/@types/transactions'
 import transactionDAO from '@/dao/transactionDAO'
@@ -183,4 +184,77 @@ export const getTransactionById = async (
   }
 
   response.ok(res, transaction)
+}
+
+export const updateTransaction = async (
+  req: TypedRequestParams<typeof TransactionIdParamsSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { transactionId } = req.params
+  const { amount, category, description, walletId, paidAt } =
+    req.body as UpdateTransactionRequest
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  let transactionIdInt = 0
+
+  try {
+    transactionIdInt = parseInt(transactionId)
+  } catch (e) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid transaction id',
+    })
+    return
+  }
+
+  const transaction = await transactionDAO.getTransactionById(transactionIdInt)
+
+  if (!transaction) {
+    response.notFound(res, {
+      message: 'Not found',
+      description: 'Transaction not found',
+    })
+    return
+  }
+
+  const wallet = await walletDAO.getWallet(transaction.walletId)
+
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description: 'You do not have permission to update this transaction',
+    })
+    return
+  }
+
+  if (walletId !== wallet.id) {
+    const newWallet = await walletDAO.getWallet(walletId)
+
+    if (!newWallet || newWallet.userId !== userId) {
+      response.forbidden(res, {
+        message: 'Forbidden',
+        description:
+          'You do not have permission to add transactions to this wallet',
+      })
+      return
+    }
+  }
+
+  const updatedTransaction = await transactionDAO.updateTransaction(
+    transaction.id,
+    {
+      amount,
+      category,
+      description,
+      walletId,
+      paidAt,
+    }
+  )
+
+  response.ok(res, updatedTransaction)
 }

@@ -1,4 +1,13 @@
-import { and, desc, eq, ilike, inArray, isNull, type SQL } from 'drizzle-orm'
+import {
+  and,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNull,
+  sql,
+  type SQL,
+} from 'drizzle-orm'
 import walletDAO from '@/dao/walletDAO'
 import { transactionsTable, walletsTable } from '@/db/schema'
 import { db } from '@/utils/db'
@@ -97,11 +106,31 @@ const insertTransaction = async (transaction: NewTransaction) => {
   return transactions[0]
 }
 
+const updateTransaction = async (id: number, transaction: NewTransaction) => {
+  const updatedFields = {
+    amount: transaction.amount,
+    category: transaction.category,
+    description: transaction.description,
+    walletId: transaction.walletId,
+    paidAt: transaction.paidAt,
+    updatedAt: sql`NOW()`,
+  }
+
+  const transactions = await db
+    .update(transactionsTable)
+    .set(updatedFields)
+    .where(TransactionIdEqualTo(id))
+    .returning()
+
+  return transactions[0]
+}
+
 const transactionDAO = {
   deleteTransaction,
   getTransactionById,
   getTransactionsByWalletId,
   insertTransaction,
+  updateTransaction,
 }
 
 export default transactionDAO

@@ -86,6 +86,9 @@ export const GetWalletsRequestSchema = z.object({
 
 export const GetWalletsResponseSchema = z.array(WalletSchema)
 
+export const UpdateTransactionRequestSchema =
+  CreateTransactionRequestSchema.merge(z.object({ id: z.number() }))
+
 export type CreateTransactionRequest = z.infer<
   typeof CreateTransactionRequestSchema
 >
@@ -104,6 +107,9 @@ export type GetWalletsRequest = z.infer<typeof GetWalletsRequestSchema>
 export type GetWalletsResponse = z.infer<typeof GetWalletsResponseSchema>
 export type Transaction = z.infer<typeof TransactionSchema>
 export type TransactionWithWallet = z.infer<typeof TransactionWithWalletSchema>
+export type UpdateTransactionRequest = z.infer<
+  typeof UpdateTransactionRequestSchema
+>
 export type Wallet = z.infer<typeof WalletSchema>
 export type WalletWithSpendingPeriodTotal = z.infer<
   typeof WalletWithSpendingPeriodTotalSchema
