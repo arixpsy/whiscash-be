@@ -89,7 +89,7 @@ export const GetWalletChartDataResponseSchema = z.array(
   z.object({
     startPeriod: z.string(),
     spendingPeriodTotal: z.number(),
-    transactions: z.array(TransactionSchema),
+    transactions: z.array(TransactionSchema).nullable(),
   })
 )
 export const GetWalletsRequestSchema = z.object({
@@ -115,6 +115,9 @@ export type GetDashboardWalletsResponse = z.infer<
 export type GetTransactionRequest = z.infer<typeof GetTransactionRequestSchema>
 export type GetTransactionsResponse = z.infer<
   typeof GetTransactionsResponseSchema
+>
+export type GetWalletChartDataRequest = z.infer<
+  typeof GetWalletChartDataRequestSchema
 >
 export type GetWalletsRequest = z.infer<typeof GetWalletsRequestSchema>
 export type GetWalletsResponse = z.infer<typeof GetWalletsResponseSchema>
