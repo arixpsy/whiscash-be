@@ -111,9 +111,9 @@ const getWalletChartData = async (
   const result: PgRaw<NeonHttpQueryResult<RawWalletChartData>> = db.execute(sql`
     WITH date_ranges AS (
       SELECT generate_series(
-        DATE_TRUNC('${unit}', NOW() AT TIME ZONE '${timezone}') - INTERVAL '${limit + offset} ${unit}', 
-        DATE_TRUNC('${unit}', NOW() AT TIME ZONE '${timezone}') - INTERVAL '${offset} ${unit}', 
-        INTERVAL '1 ${unit}'
+        DATE_TRUNC(${unit}, NOW() AT TIME ZONE ${timezone}) - ${limit + offset + unit}::INTERVAL, 
+        DATE_TRUNC(${unit}, NOW() AT TIME ZONE ${timezone}) - ${offset + unit}::INTERVAL, 
+        ${'1 ' + unit}::INTERVAL
       ) AS "startPeriod"
     )
 
@@ -137,14 +137,14 @@ const getWalletChartData = async (
     FROM date_ranges d
     LEFT JOIN transactions t
     ON (t.wallet_id = ${walletId} OR t.wallet_id IN (SELECT id FROM wallets WHERE sub_wallet_of = ${walletId})) 
-    AND t.paid_at >= d."startPeriod" AT TIME ZONE '${timezone}'
-    AND t.paid_at < (d."startPeriod" + INTERVAL '1 ${unit}') AT TIME ZONE '${timezone}'
+    AND t.paid_at >= d."startPeriod" AT TIME ZONE ${timezone}
+    AND t.paid_at < (d."startPeriod" + ${'1 ' + unit}::INTERVAL) AT TIME ZONE ${timezone}
     GROUP BY d."startPeriod"
     ORDER BY d."startPeriod" DESC
-    LIMIT ${limit} OFFSET ${offset};
+    LIMIT ${limit} OFFSET ${offset}
   `)
 
-  return result
+  return (await result).rows
 }
 
 const insertTransaction = async (transaction: NewTransaction) => {
