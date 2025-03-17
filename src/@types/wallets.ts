@@ -14,7 +14,7 @@ export type RawWalletAndSpendingPeriodTotal = {
   updatedAt: string
   createdAt: string
   deletedAt: string
-  spendingPeriodTotal: string
+  spendingPeriodTotal: number
 }
 
 export const WalletIdParamsSchema = z.object({

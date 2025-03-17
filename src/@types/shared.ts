@@ -88,7 +88,7 @@ export const GetWalletChartDataRequestSchema = z.object({
 export const GetWalletChartDataResponseSchema = z.array(
   z.object({
     startPeriod: z.string(),
-    spendingPeriodTotal: z.string(),
+    spendingPeriodTotal: z.number(),
     transactions: z.array(TransactionSchema).nullable(),
   })
 )

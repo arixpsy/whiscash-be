@@ -121,7 +121,7 @@ const getWalletChartData = async (
 
     SELECT 
       d."startPeriod", 
-      COALESCE(ROUND(SUM(t.amount)::NUMERIC, 2), 0) AS "spendingPeriodTotal", 
+      CAST(ROUND(COALESCE(SUM(t.amount)::NUMERIC, 0), 2) AS FLOAT) AS "spendingPeriodTotal", 
       json_agg(
         jsonb_build_object(
           'id', t.id,
