@@ -11,6 +11,8 @@ import {
   getAllMainWallets,
   getWalletById,
   getWalletChartData,
+  deleteWallet,
+  archiveWallet,
 } from '@/controllers/wallet'
 import {
   CreateWalletRequestSchema,
@@ -42,16 +44,27 @@ walletRoutes.get(
   validateRequestParams(WalletIdParamsSchema),
   getWalletById
 )
+walletRoutes.delete(
+  '/:walletId',
+  validateRequestParams(WalletIdParamsSchema),
+  deleteWallet
+)
 walletRoutes.get(
   '/:walletId/chart',
   validateRequestParams(WalletIdParamsSchema),
   validateRequestQuery(GetWalletChartDataRequestSchema),
   getWalletChartData
 )
+walletRoutes.put(
+  '/:walletId/archive',
+  validateRequestParams(WalletIdParamsSchema),
+  archiveWallet
+)
 walletRoutes.post(
   '/',
   validateRequestBody(CreateWalletRequestSchema),
   createWallet
 )
+
 
 export default walletRoutes

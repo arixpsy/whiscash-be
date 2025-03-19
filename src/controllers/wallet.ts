@@ -1,4 +1,4 @@
-import { type Request, type Response } from 'express'
+import { type Response } from 'express'
 import type {
   TypedRequestBody,
   TypedRequestParams,
@@ -17,6 +17,45 @@ import settingsDAO from '@/dao/settingsDAO'
 import walletDAO from '@/dao/walletDAO'
 import response from '@/utils/response'
 import transactionDAO from '@/dao/transactionDAO'
+
+export const archiveWallet = async (
+  req: TypedRequestParams<typeof WalletIdParamsSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { walletId } = req.params
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  let walletIdInt = 0
+
+  try {
+    walletIdInt = parseInt(walletId)
+  } catch (e) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid wallet id',
+    })
+    return
+  }
+
+  const wallet = await walletDAO.getWallet(walletIdInt)
+
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description: 'You do not have permission to archive this wallet',
+    })
+    return
+  }
+
+  // TODO: Implement archive wallet
+
+  response.ok(res, undefined)
+}
 
 export const createWallet = async (
   req: TypedRequestBody<typeof CreateWalletRequestSchema>,
@@ -40,6 +79,45 @@ export const createWallet = async (
   })
 
   response.created(res, newWallet)
+}
+
+export const deleteWallet = async (
+  req: TypedRequestParams<typeof WalletIdParamsSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { walletId } = req.params
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  let walletIdInt = 0
+
+  try {
+    walletIdInt = parseInt(walletId)
+  } catch (e) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid wallet id',
+    })
+    return
+  }
+
+  const wallet = await walletDAO.getWallet(walletIdInt)
+
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description: 'You do not have permission to delete this wallet',
+    })
+    return
+  }
+
+  // TODO: Implement delete wallet
+
+  response.ok(res, undefined)
 }
 
 export const getAllDashboardWallets = async (
