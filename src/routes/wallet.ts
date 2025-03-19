@@ -66,5 +66,4 @@ walletRoutes.post(
   createWallet
 )
 
-
 export default walletRoutes
