@@ -115,9 +115,21 @@ export const deleteWallet = async (
     return
   }
 
-  // TODO: Implement delete wallet
+  const subWallets = await walletDAO.getWalletSubWallets(walletIdInt)
 
-  response.ok(res, undefined)
+  if (subWallets.length > 0) {
+    response.internalServerError(res, {
+      message: 'Internal server error',
+      description: 'You cannot delete a wallet with existing sub-wallets',
+    })
+    return
+  }
+
+  await transactionDAO.deleteTransactionsByWalletId(walletIdInt)
+
+  const deletedWallet = await walletDAO.deleteWallet(walletIdInt)
+
+  response.ok(res, deletedWallet)
 }
 
 export const getAllDashboardWallets = async (

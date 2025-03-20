@@ -38,7 +38,7 @@ const transactionResponse = {
 // Filter Conditions
 const TransactionIdEqualTo = (transactionId: number) =>
   eq(transactionsTable.id, transactionId)
-const WallletIdEqualTo = (walletId: number) =>
+const WalletIdEqualTo = (walletId: number) =>
   eq(transactionsTable.walletId, walletId)
 const WalletIdIn = (walletIds: Array<number>) =>
   inArray(transactionsTable.walletId, walletIds)
@@ -57,6 +57,9 @@ const deleteTransaction = async (transactionId: number) => {
 
   return deletedTransaction[0]
 }
+
+const deleteTransactionsByWalletId = async (walletId: number) =>
+  db.delete(transactionsTable).where(WalletIdEqualTo(walletId)).returning()
 
 const getTransactionById = async (transactionId: number) => {
   const transaction = await db
@@ -179,6 +182,7 @@ const updateTransaction = async (id: number, transaction: NewTransaction) => {
 
 const transactionDAO = {
   deleteTransaction,
+  deleteTransactionsByWalletId,
   getTransactionById,
   getTransactionsByWalletId,
   getWalletChartData,
