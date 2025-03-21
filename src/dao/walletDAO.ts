@@ -26,6 +26,8 @@ const SortByOrderIndex = asc(walletsTable.orderIndex)
 const SortByCreatedAt = asc(walletsTable.createdAt)
 
 const archiveWallet = async (walletId: number) => {
+  // TODO: update orderIndex of all wallets that have a higher orderIndex
+  // TODO: set orderIndex to -1 for archived wallet
   const archivedWallet = await db
     .update(walletsTable)
     .set({ archivedAt: sql`NOW()`, updatedAt: sql`NOW()` })
@@ -36,6 +38,7 @@ const archiveWallet = async (walletId: number) => {
 }
 
 const deleteWallet = async (walletId: number) => {
+  // TODO: update orderIndex of all wallets that have a higher orderIndex
   const deletedWallet = await db
     .delete(walletsTable)
     .where(WalletIdEqualTo(walletId))
@@ -86,12 +89,15 @@ const getAllDashboardWallets = async (userId: string, timezone: string) => {
   return (await result).rows
 }
 
-const getAllWallets = (userId: string, { searchPhrase }: GetWalletsRequest) =>
+const getAllWallets = (
+  userId: string,
+  { searchPhrase, archived }: GetWalletsRequest
+) =>
   getWallets(
     [
       UserIdEqualTo(userId),
-      ArchivedAtIsNull,
       DeletedAtAtIsNull,
+      ...(archived ? [] : [ArchivedAtIsNull]),
       ...(searchPhrase ? [NameLike(searchPhrase)] : []),
     ],
     SortByOrderIndex
@@ -140,6 +146,7 @@ const insertWallet = async (wallet: NewWallet) => {
 }
 
 const unarchiveWallet = async (walletId: number) => {
+  // TODO: update orderIndex of wallet to the highest orderIndex + 1
   const archivedWallet = await db
     .update(walletsTable)
     .set({ archivedAt: null, updatedAt: sql`NOW()` })

@@ -95,6 +95,7 @@ export const GetWalletChartDataResponseSchema = z.array(
 export const GetWalletsRequestSchema = z.object({
   searchPhrase: z.string().optional(),
   currency: z.string().length(3).optional(),
+  archived: z.boolean().optional(),
 })
 
 export const GetWalletsResponseSchema = z.array(WalletSchema)
