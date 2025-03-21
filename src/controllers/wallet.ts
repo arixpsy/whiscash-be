@@ -18,7 +18,7 @@ import walletDAO from '@/dao/walletDAO'
 import response from '@/utils/response'
 import transactionDAO from '@/dao/transactionDAO'
 
-export const archiveWallet = async (
+export const toggleArchiveWallet = async (
   req: TypedRequestParams<typeof WalletIdParamsSchema>,
   res: Response
 ) => {
@@ -52,9 +52,17 @@ export const archiveWallet = async (
     return
   }
 
-  // TODO: Implement archive wallet
+  const archivedAt = wallet.archivedAt
 
-  response.ok(res, undefined)
+  let updatedWallet = undefined
+
+  if (archivedAt) {
+    updatedWallet = await walletDAO.archiveWallet(walletIdInt)
+  } else {
+    updatedWallet = await walletDAO.unarchiveWallet(walletIdInt)
+  }
+
+  response.ok(res, updatedWallet)
 }
 
 export const createWallet = async (

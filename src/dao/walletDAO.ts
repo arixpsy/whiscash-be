@@ -25,6 +25,16 @@ const NameLike = (searchPhrase: string) =>
 const SortByOrderIndex = asc(walletsTable.orderIndex)
 const SortByCreatedAt = asc(walletsTable.createdAt)
 
+const archiveWallet = async (walletId: number) => {
+  const archivedWallet = await db
+    .update(walletsTable)
+    .set({ archivedAt: sql`NOW()` })
+    .where(WalletIdEqualTo(walletId))
+    .returning()
+
+  return archivedWallet[0]
+}
+
 const deleteWallet = async (walletId: number) => {
   const deletedWallet = await db
     .delete(walletsTable)
@@ -129,7 +139,18 @@ const insertWallet = async (wallet: NewWallet) => {
   return wallets[0]
 }
 
+const unarchiveWallet = async (walletId: number) => {
+  const archivedWallet = await db
+    .update(walletsTable)
+    .set({ archivedAt: null })
+    .where(WalletIdEqualTo(walletId))
+    .returning()
+
+  return archivedWallet[0]
+}
+
 const walletDAO = {
+  archiveWallet,
   deleteWallet,
   getAllDashboardWallets,
   getAllWallets,
@@ -137,6 +158,7 @@ const walletDAO = {
   getWallet,
   getWalletSubWallets,
   insertWallet,
+  unarchiveWallet,
 }
 
 export default walletDAO

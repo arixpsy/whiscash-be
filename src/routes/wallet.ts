@@ -12,7 +12,7 @@ import {
   getWalletById,
   getWalletChartData,
   deleteWallet,
-  archiveWallet,
+  toggleArchiveWallet,
 } from '@/controllers/wallet'
 import {
   CreateWalletRequestSchema,
@@ -58,7 +58,7 @@ walletRoutes.get(
 walletRoutes.put(
   '/:walletId/archive',
   validateRequestParams(WalletIdParamsSchema),
-  archiveWallet
+  toggleArchiveWallet
 )
 walletRoutes.post(
   '/',
