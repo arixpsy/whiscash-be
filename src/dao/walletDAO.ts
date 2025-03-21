@@ -97,7 +97,7 @@ const getAllWallets = (
     [
       UserIdEqualTo(userId),
       DeletedAtAtIsNull,
-      ...(archived ? [] : [ArchivedAtIsNull]),
+      ...(archived === 'true' ? [] : [ArchivedAtIsNull]),
       ...(searchPhrase ? [NameLike(searchPhrase)] : []),
     ],
     SortByOrderIndex

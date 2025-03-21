@@ -190,7 +190,7 @@ export const getAllWallets = async (
   res: Response
 ) => {
   const { userId } = req.auth
-  const { searchPhrase } = req.query
+  const { searchPhrase, archived } = req.query
 
   if (!userId) {
     response.unauthorized(res)
@@ -199,6 +199,7 @@ export const getAllWallets = async (
 
   const userWallets = await walletDAO.getAllWallets(userId, {
     searchPhrase,
+    archived,
   })
 
   response.ok(res, userWallets)
