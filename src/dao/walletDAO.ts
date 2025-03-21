@@ -28,7 +28,7 @@ const SortByCreatedAt = asc(walletsTable.createdAt)
 const archiveWallet = async (walletId: number) => {
   const archivedWallet = await db
     .update(walletsTable)
-    .set({ archivedAt: sql`NOW()` })
+    .set({ archivedAt: sql`NOW()`, updatedAt: sql`NOW()` })
     .where(WalletIdEqualTo(walletId))
     .returning()
 
@@ -78,7 +78,7 @@ const getAllDashboardWallets = async (userId: string, timezone: string) => {
         WHEN w.spending_period = 'ALL'   THEN TRUE
       END
     )
-    where w.user_id = ${userId}
+    where w.user_id = ${userId} AND w.archived_at IS NULL
     GROUP BY w.id
     order by w.order_index asc
     `)
@@ -142,7 +142,7 @@ const insertWallet = async (wallet: NewWallet) => {
 const unarchiveWallet = async (walletId: number) => {
   const archivedWallet = await db
     .update(walletsTable)
-    .set({ archivedAt: null })
+    .set({ archivedAt: null, updatedAt: sql`NOW()` })
     .where(WalletIdEqualTo(walletId))
     .returning()
 

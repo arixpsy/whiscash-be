@@ -57,9 +57,9 @@ export const toggleArchiveWallet = async (
   let updatedWallet = undefined
 
   if (archivedAt) {
-    updatedWallet = await walletDAO.archiveWallet(walletIdInt)
-  } else {
     updatedWallet = await walletDAO.unarchiveWallet(walletIdInt)
+  } else {
+    updatedWallet = await walletDAO.archiveWallet(walletIdInt)
   }
 
   response.ok(res, updatedWallet)
