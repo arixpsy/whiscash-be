@@ -1,4 +1,4 @@
-import { and, asc, eq, ilike, isNull, SQL, sql } from 'drizzle-orm'
+import { and, asc, eq, ilike, isNull, not, SQL, sql } from 'drizzle-orm'
 import type { NeonHttpQueryResult } from 'drizzle-orm/neon-http'
 import type { PgRaw } from 'drizzle-orm/pg-core/query-builders/raw'
 import type { RawWalletAndSpendingPeriodTotal } from '@/@types/wallets'
@@ -17,6 +17,7 @@ const SubWalletofEqualTo = (walletId: number) =>
 const WalletIdEqualTo = (walletId: number) => eq(walletsTable.id, walletId)
 const SubWalletofIsNull = isNull(walletsTable.subWalletOf)
 const ArchivedAtIsNull = isNull(walletsTable.archivedAt)
+const ArchivedAtIsNotNull = not(isNull(walletsTable.archivedAt))
 const DeletedAtAtIsNull = isNull(walletsTable.deletedAt)
 const NameLike = (searchPhrase: string) =>
   ilike(walletsTable.name, `%${searchPhrase}%`)
@@ -91,13 +92,14 @@ const getAllDashboardWallets = async (userId: string, timezone: string) => {
 
 const getAllWallets = (
   userId: string,
-  { searchPhrase, archived }: GetWalletsRequest
+  { searchPhrase, type }: GetWalletsRequest
 ) =>
   getWallets(
     [
       UserIdEqualTo(userId),
       DeletedAtAtIsNull,
-      ...(archived === 'true' ? [] : [ArchivedAtIsNull]),
+      ...(type === 'ACTIVE' ? [ArchivedAtIsNull] : []),
+      ...(type === 'ARCHIVED' ? [ArchivedAtIsNotNull] : []),
       ...(searchPhrase ? [NameLike(searchPhrase)] : []),
     ],
     SortByOrderIndex
