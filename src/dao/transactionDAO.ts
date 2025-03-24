@@ -14,7 +14,7 @@ import type { RawWalletChartData } from '@/@types/transactions'
 import walletDAO from '@/dao/walletDAO'
 import { transactionsTable, walletsTable } from '@/db/schema'
 import { db } from '@/utils/db'
-import type { SpendingPeriod } from '@/utils/enum'
+import { SpendingPeriod } from '@/utils/enum'
 
 type NewTransaction = typeof transactionsTable.$inferInsert
 
@@ -104,6 +104,7 @@ const getTransactionsByWalletId = async (
   )
 }
 
+// TODO: clean up this
 const getWalletChartData = async (
   walletId: number,
   timezone: string,
@@ -111,6 +112,35 @@ const getWalletChartData = async (
   limit: number,
   offset: number
 ) => {
+  if (unit === SpendingPeriod.All) {
+    const result: PgRaw<NeonHttpQueryResult<RawWalletChartData>> =
+      db.execute(sql`
+      SELECT 
+        NOW() "startPeriod", 
+        CAST(ROUND(COALESCE(SUM(t.amount)::NUMERIC, 0), 2) AS FLOAT) AS "spendingPeriodTotal", 
+        json_agg(
+          jsonb_build_object(
+            'id', t.id,
+            'walletId', t.wallet_id,
+            'amount', t.amount,
+            'category', t.category,
+            'description', t.description,
+            'paidAt', t.paid_at,
+            'subscriptionId', t.subscription_id,
+            'createdAt', t.created_at,
+            'updatedAt', t.updated_at,
+            'deletedAt', t.deleted_at
+          )
+        ) FILTER (WHERE t.id IS NOT NULL) AS transactions
+      FROM wallets w
+      LEFT JOIN transactions t
+      ON w.id = t.wallet_id
+      AND (t.wallet_id = ${walletId} OR t.wallet_id IN (SELECT id FROM wallets WHERE sub_wallet_of = ${walletId}))
+    `)
+
+    return (await result).rows
+  }
+
   const ONE = '1'
 
   const result: PgRaw<NeonHttpQueryResult<RawWalletChartData>> = db.execute(sql`
@@ -141,7 +171,7 @@ const getWalletChartData = async (
       ) FILTER (WHERE t.id IS NOT NULL) AS transactions
     FROM date_ranges d
     LEFT JOIN transactions t
-    ON (t.wallet_id = ${walletId} OR t.wallet_id IN (SELECT id FROM wallets WHERE sub_wallet_of = ${walletId})) 
+    ON (t.wallet_id = ${walletId} OR t.wallet_id IN (SELECT id FROM wallets WHERE sub_wallet_of = ${walletId}))
     AND t.paid_at >= d."startPeriod" AT TIME ZONE ${timezone}
     AND t.paid_at < (d."startPeriod" + ${ONE + unit}::INTERVAL) AT TIME ZONE ${timezone}
     GROUP BY d."startPeriod"
