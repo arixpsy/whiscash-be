@@ -75,10 +75,10 @@ const getAllDashboardWallets = async (userId: string, timezone: string) => {
     ON (t.wallet_id = w.id OR t.wallet_id IN (SELECT id FROM wallets WHERE sub_wallet_of = w.id))
     AND (
       CASE 
-        WHEN w.spending_period = 'DAY'   THEN t.paid_at >= NOW() AT TIME ZONE ${timezone}
-        WHEN w.spending_period = 'WEEK'  THEN t.paid_at >= DATE_TRUNC('week', NOW() AT TIME ZONE ${timezone})
-        WHEN w.spending_period = 'MONTH' THEN t.paid_at >= DATE_TRUNC('month', NOW() AT TIME ZONE ${timezone})
-        WHEN w.spending_period = 'YEAR'  THEN t.paid_at >= DATE_TRUNC('year', NOW() AT TIME ZONE ${timezone})
+        WHEN w.spending_period = 'DAY'   THEN t.paid_at >= DATE_TRUNC('day', NOW(), ${timezone})
+        WHEN w.spending_period = 'WEEK'  THEN t.paid_at >= DATE_TRUNC('week', NOW(), ${timezone})
+        WHEN w.spending_period = 'MONTH' THEN t.paid_at >= DATE_TRUNC('month', NOW(), ${timezone})
+        WHEN w.spending_period = 'YEAR'  THEN t.paid_at >= DATE_TRUNC('year', NOW(), ${timezone})
         WHEN w.spending_period = 'ALL'   THEN TRUE
       END
     )
