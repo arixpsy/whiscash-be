@@ -150,6 +150,10 @@ const getWalletChartData = async (
         DATE_TRUNC(${unit}, NOW() AT TIME ZONE ${timezone}) - ${offset + unit}::INTERVAL, 
         ${ONE + unit}::INTERVAL
       ) AS "startPeriod"
+    ),
+
+    sub_wallets AS (
+      SELECT id, name FROM wallets WHERE sub_wallet_of = ${walletId}
     )
 
     SELECT 
@@ -160,7 +164,7 @@ const getWalletChartData = async (
           'id', t.id,
           'walletId', t.wallet_id,
           'amount', t.amount,
-          'category', t.category,
+          'category', COALESCE(sw.name::TEXT, t.category::TEXT),
           'description', t.description,
           'paidAt', t.paid_at,
           'subscriptionId', t.subscription_id,
@@ -171,9 +175,10 @@ const getWalletChartData = async (
       ) FILTER (WHERE t.id IS NOT NULL) AS transactions
     FROM date_ranges d
     LEFT JOIN transactions t
-    ON (t.wallet_id = ${walletId} OR t.wallet_id IN (SELECT id FROM wallets WHERE sub_wallet_of = ${walletId}))
+    ON (t.wallet_id = ${walletId} OR t.wallet_id IN (SELECT id FROM sub_wallets))
     AND t.paid_at >= d."startPeriod" AT TIME ZONE ${timezone}
     AND t.paid_at < (d."startPeriod" + ${ONE + unit}::INTERVAL) AT TIME ZONE ${timezone}
+    LEFT JOIN sub_wallets sw ON t.wallet_id = sw.id
     GROUP BY d."startPeriod"
     ORDER BY d."startPeriod" DESC
     LIMIT ${limit}
