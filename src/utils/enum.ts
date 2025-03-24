@@ -10,6 +10,7 @@ export type SpendingPeriod =
   (typeof SpendingPeriod)[keyof typeof SpendingPeriod]
 
 export const Category = {
+  Accommodation: 'ACCOMMODATION',
   Entertainment: 'ENTERTAINMENT',
   Fitness: 'FITNESS',
   Food: 'FOOD',
@@ -22,6 +23,7 @@ export const Category = {
   Pet: 'PET',
   Shopping: 'SHOPPING',
   Transport: 'TRANSPORT',
+  Transfers: 'TRANSFERS',
   Travel: 'TRAVEL',
   Utilities: 'UTILITIES',
   Work: 'WORK',
