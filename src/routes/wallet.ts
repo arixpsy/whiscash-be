@@ -13,12 +13,14 @@ import {
   getWalletChartData,
   deleteWallet,
   toggleArchiveWallet,
+  updateWallet,
 } from '@/controllers/wallet'
 import {
   CreateWalletRequestSchema,
   GetDashboardWalletsRequest,
   GetWalletChartDataRequestSchema,
   GetWalletsRequestSchema,
+  UpdateWalletRequestSchema,
 } from '@/@types/shared'
 import { WalletIdParamsSchema } from '@/@types/wallets'
 
@@ -48,6 +50,12 @@ walletRoutes.delete(
   '/:walletId',
   validateRequestParams(WalletIdParamsSchema),
   deleteWallet
+)
+walletRoutes.put(
+  '/:walletId',
+  validateRequestParams(WalletIdParamsSchema),
+  validateRequestBody(UpdateWalletRequestSchema),
+  updateWallet
 )
 walletRoutes.get(
   '/:walletId/chart',

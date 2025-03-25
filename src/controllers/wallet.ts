@@ -7,6 +7,7 @@ import type {
 import {
   CreateWalletRequestSchema,
   GetWalletChartDataRequestSchema,
+  UpdateWalletRequestSchema,
 } from '@/@types/shared'
 import {
   GetDashboardWalletsRequest,
@@ -283,4 +284,56 @@ export const getWalletChartData = async (
   )
 
   response.ok(res, chartData)
+}
+
+export const updateWallet = async (
+  req: TypedRequestBody<typeof UpdateWalletRequestSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { walletId } = req.params
+  const { name, spendingPeriod, subWalletOf } = req.body
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  let walletIdInt = 0
+
+  try {
+    walletIdInt = parseInt(walletId)
+  } catch (e) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid wallet id',
+    })
+    return
+  }
+
+  const wallet = await walletDAO.getWallet(walletIdInt)
+
+  if (!wallet || wallet.userId !== userId) {
+    response.forbidden(res, {
+      message: 'Forbidden',
+      description: 'You do not have permission to update this wallet',
+    })
+    return
+  }
+
+  if (subWalletOf === walletIdInt) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'This wallet cannot be a sub wallet of itself',
+    })
+    return
+  }
+
+  const updatedWallet = await walletDAO.updateWallet(wallet.id, {
+    name,
+    spendingPeriod,
+    subWalletOf,
+  })
+
+  response.ok(res, updatedWallet)
 }

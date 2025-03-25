@@ -3,7 +3,11 @@ import type { NeonHttpQueryResult } from 'drizzle-orm/neon-http'
 import type { PgRaw } from 'drizzle-orm/pg-core/query-builders/raw'
 import type { RawWalletAndSpendingPeriodTotal } from '@/@types/wallets'
 import { type GetWalletsRequest } from '@/@types/shared'
-import { transactionsTable, walletsTable } from '@/db/schema'
+import {
+  spendingPeriodEnum,
+  transactionsTable,
+  walletsTable,
+} from '@/db/schema'
 import { db } from '@/utils/db'
 
 type NewWallet = typeof walletsTable.$inferInsert
@@ -158,6 +162,23 @@ const unarchiveWallet = async (walletId: number) => {
   return archivedWallet[0]
 }
 
+const updateWallet = async (id: number, wallet: Partial<NewWallet>) => {
+  const updatedFields = {
+    name: wallet.name,
+    spendingPeriod: wallet.spendingPeriod,
+    subWalletOf: wallet.subWalletOf,
+    updatedAt: sql`NOW()`,
+  }
+
+  const wallets = await db
+    .update(walletsTable)
+    .set(updatedFields)
+    .where(WalletIdEqualTo(id))
+    .returning()
+
+  return wallets[0]
+}
+
 const walletDAO = {
   archiveWallet,
   deleteWallet,
@@ -168,6 +189,7 @@ const walletDAO = {
   getWalletSubWallets,
   insertWallet,
   unarchiveWallet,
+  updateWallet,
 }
 
 export default walletDAO

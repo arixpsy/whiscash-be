@@ -187,7 +187,7 @@ export const getTransactionById = async (
 }
 
 export const updateTransaction = async (
-  req: TypedRequestQuery<typeof UpdateTransactionRequestSchema>,
+  req: TypedRequestBody<typeof UpdateTransactionRequestSchema>,
   res: Response
 ) => {
   const { userId } = req.auth
