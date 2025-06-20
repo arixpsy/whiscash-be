@@ -40,7 +40,7 @@ export const createTransaction = async (
   const newTransaction = await transactionDAO.insertTransaction({
     amount,
     category,
-    description,
+    description: description.trim(),
     walletId,
     paidAt,
   })
@@ -249,7 +249,7 @@ export const updateTransaction = async (
     {
       amount,
       category,
-      description,
+      description: description.trim(),
       walletId,
       paidAt,
     }
