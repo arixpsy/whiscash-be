@@ -69,11 +69,17 @@ export const GetDashboardWalletsResponse = z.array(
 )
 
 // Values are string typed due to search params
-export const GetTransactionRequestSchema = z.object({
-  walletId: z.string(),
+export const GetTransactionsRequestSchema = z.object({
   limit: z.string(),
   offset: z.string().optional(),
 })
+
+export const GetWalletTransactionsRequestSchema =
+  GetTransactionsRequestSchema.merge(
+    z.object({
+      walletId: z.string(),
+    })
+  )
 
 export const GetTransactionsResponseSchema = z.array(
   TransactionWithWalletSchema
@@ -118,7 +124,12 @@ export type GetDashboardWalletsRequest = z.infer<
 export type GetDashboardWalletsResponse = z.infer<
   typeof GetDashboardWalletsResponse
 >
-export type GetTransactionRequest = z.infer<typeof GetTransactionRequestSchema>
+export type GetTransactionsRequest = z.infer<
+  typeof GetTransactionsRequestSchema
+>
+export type GetWalletTransactionsRequest = z.infer<
+  typeof GetWalletTransactionsRequestSchema
+>
 export type GetTransactionsResponse = z.infer<
   typeof GetTransactionsResponseSchema
 >

@@ -6,14 +6,14 @@ import {
 } from 'zod-express-middleware'
 import {
   CreateTransactionRequestSchema,
-  GetTransactionRequestSchema,
+  GetTransactionsRequestSchema,
   UpdateTransactionRequestSchema,
 } from '@/@types/shared'
 import {
   createTransaction,
   deleteTransaction,
   getTransactionById,
-  getTransactionsByWalletId,
+  getAllTransactions,
   updateTransaction,
 } from '@/controllers/transaction'
 import { TransactionIdParamsSchema } from '@/@types/transactions'
@@ -22,8 +22,8 @@ const transactionRoutes = Router()
 
 transactionRoutes.get(
   '/',
-  validateRequestQuery(GetTransactionRequestSchema),
-  getTransactionsByWalletId
+  validateRequestQuery(GetTransactionsRequestSchema),
+  getAllTransactions
 )
 transactionRoutes.get(
   '/:transactionId',

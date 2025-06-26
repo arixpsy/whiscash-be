@@ -6,7 +6,8 @@ import type {
 } from 'zod-express-middleware'
 import type {
   CreateTransactionRequestSchema,
-  GetTransactionRequestSchema,
+  GetTransactionsRequestSchema,
+  GetWalletTransactionsRequestSchema,
   UpdateTransactionRequestSchema,
 } from '@/@types/shared'
 import type { TransactionIdParamsSchema } from '@/@types/transactions'
@@ -98,12 +99,20 @@ export const deleteTransaction = async (
   response.ok(res, deletedTransaction)
 }
 
+export const getAllTransactions = async (
+  req: TypedRequestQuery<typeof GetTransactionsRequestSchema>,
+  res: Response
+) => {
+  // TODO:
+}
+
 export const getTransactionsByWalletId = async (
-  req: TypedRequestQuery<typeof GetTransactionRequestSchema>,
+  req: TypedRequestQuery<typeof GetWalletTransactionsRequestSchema>,
   res: Response
 ) => {
   const { userId } = req.auth
-  const { walletId, limit, offset } = req.query
+  const { walletId } = req.params
+  const { limit, offset } = req.query
 
   if (!userId) {
     response.unauthorized(res)

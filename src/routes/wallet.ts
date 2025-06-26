@@ -18,11 +18,14 @@ import {
 import {
   CreateWalletRequestSchema,
   GetDashboardWalletsRequest,
+  GetTransactionsRequestSchema,
   GetWalletChartDataRequestSchema,
   GetWalletsRequestSchema,
+  GetWalletTransactionsRequestSchema,
   UpdateWalletRequestSchema,
 } from '@/@types/shared'
 import { WalletIdParamsSchema } from '@/@types/wallets'
+import { getTransactionsByWalletId } from '@/controllers/transaction'
 
 const walletRoutes = Router()
 
@@ -62,6 +65,12 @@ walletRoutes.get(
   validateRequestParams(WalletIdParamsSchema),
   validateRequestQuery(GetWalletChartDataRequestSchema),
   getWalletChartData
+)
+walletRoutes.get(
+  '/:walletId/transaction',
+  validateRequestParams(WalletIdParamsSchema),
+  validateRequestQuery(GetWalletTransactionsRequestSchema),
+  getTransactionsByWalletId
 )
 walletRoutes.put(
   '/:walletId/archive',
