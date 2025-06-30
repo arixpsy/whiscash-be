@@ -72,6 +72,7 @@ export const GetDashboardWalletsResponse = z.array(
 export const GetTransactionsRequestSchema = z.object({
   limit: z.string(),
   offset: z.string().optional(),
+  date: z.string().optional(),
 })
 
 export const GetWalletTransactionsRequestSchema =

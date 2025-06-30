@@ -1,4 +1,5 @@
 import type { Response } from 'express'
+import { DateTime } from 'luxon'
 import type {
   TypedRequestBody,
   TypedRequestParams,
@@ -103,7 +104,34 @@ export const getAllTransactions = async (
   req: TypedRequestQuery<typeof GetTransactionsRequestSchema>,
   res: Response
 ) => {
-  // TODO:
+  const { userId } = req.auth
+  const { limit, offset, date = DateTime.now().toISODate() } = req.query
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  const parseDate = DateTime.fromISO(date)
+
+  if (!parseDate.isValid) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid date value',
+    })
+    return
+  }
+
+  const allWallets = await walletDAO.getAllWallets(userId, {})
+
+  const transactions = await transactionDAO.getTransactionsByDate(
+    allWallets.map((wallet) => wallet.id),
+    parseDate,
+    limit ? parseInt(limit) : 10,
+    offset ? parseInt(offset) : 0
+  )
+
+  response.ok(res, transactions)
 }
 
 export const getTransactionsByWalletId = async (

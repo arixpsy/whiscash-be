@@ -2,6 +2,7 @@ import type { NeonHttpQueryResult } from 'drizzle-orm/neon-http'
 import type { PgRaw } from 'drizzle-orm/pg-core/query-builders/raw'
 import {
   and,
+  between,
   desc,
   eq,
   ilike,
@@ -10,6 +11,7 @@ import {
   sql,
   type SQL,
 } from 'drizzle-orm'
+import type { DateTime } from 'luxon'
 import type { RawWalletChartData } from '@/@types/transactions'
 import walletDAO from '@/dao/walletDAO'
 import { transactionsTable, walletsTable } from '@/db/schema'
@@ -45,6 +47,8 @@ const WalletIdIn = (walletIds: Array<number>) =>
 const DeletedAtAtIsNull = isNull(transactionsTable.deletedAt)
 const DescriptionLike = (searchPhrase: string) =>
   ilike(transactionsTable.description, `%${searchPhrase}%`)
+const PaidAtBetween = (startDate: string, endDate: string) =>
+  between(transactionsTable.paidAt, startDate, endDate)
 
 // Sort Values
 const SortByPaidAt = desc(transactionsTable.paidAt)
@@ -98,6 +102,27 @@ const getTransactionsByWalletId = async (
 
   return getTransactions(
     [WalletIdIn([walletId, ...subWalletIds]), DeletedAtAtIsNull],
+    SortByPaidAt,
+    limit,
+    offset
+  )
+}
+
+const getTransactionsByDate = async (
+  walletsIds: Array<number>,
+  date: DateTime<true>,
+  limit: number,
+  offset?: number
+) => {
+  const startDate = date.toUTC().toSQL()
+  const endDate = date
+    .toUTC()
+    .plus({ days: 1 })
+    .minus({ milliseconds: 1 })
+    .toSQL()
+
+  return getTransactions(
+    [WalletIdIn(walletsIds), PaidAtBetween(startDate, endDate)],
     SortByPaidAt,
     limit,
     offset
@@ -218,6 +243,7 @@ const updateTransaction = async (id: number, transaction: NewTransaction) => {
 const transactionDAO = {
   deleteTransaction,
   deleteTransactionsByWalletId,
+  getTransactionsByDate,
   getTransactionById,
   getTransactionsByWalletId,
   getWalletChartData,
