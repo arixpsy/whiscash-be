@@ -68,6 +68,14 @@ export const GetDashboardWalletsResponse = z.array(
   WalletWithSpendingPeriodTotalSchema
 )
 
+export const GetImageTransactionDetailsResponseSchema =
+  CreateTransactionRequestSchema.pick({
+    amount: true,
+    category: true,
+    description: true,
+    paidAt: true,
+  }).partial()
+
 // Values are string typed due to search params
 export const GetTransactionsRequestSchema = z.object({
   limit: z.string(),
@@ -124,6 +132,9 @@ export type GetDashboardWalletsRequest = z.infer<
 >
 export type GetDashboardWalletsResponse = z.infer<
   typeof GetDashboardWalletsResponse
+>
+export type GetImageTransactionDetailsResponse = z.infer<
+  typeof GetImageTransactionDetailsResponseSchema
 >
 export type GetTransactionsRequest = z.infer<
   typeof GetTransactionsRequestSchema

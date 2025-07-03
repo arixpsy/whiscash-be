@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { settingsTable } from '@/db/schema'
 import { db } from '@/utils/db'
 
@@ -6,10 +6,25 @@ import { db } from '@/utils/db'
 const SettingsResponse = {
   timezone: settingsTable.timezone,
   userId: settingsTable.userId,
+  imageEndpointCount: settingsTable.imageEndpointCount,
+  imageEndpointEnabled: settingsTable.imageEndpointEnabled,
 }
 
 // Filter Conditions
 const UserIdEqualTo = (userId: string) => eq(settingsTable.userId, userId)
+
+const getUserImageEndpointEnabled = async (userId: string) => {
+  const settingsResult = await db
+    .select(SettingsResponse)
+    .from(settingsTable)
+    .where(UserIdEqualTo(userId))
+
+  if (settingsResult.length === 0) {
+    return false
+  }
+
+  return settingsResult[0].imageEndpointCount
+}
 
 const getUserTimezone = async (userId: string) => {
   const settingsResult = await db
@@ -44,9 +59,23 @@ const getUserTimezoneAndCreateIfNull = async (
   return settingsResult[0].timezone
 }
 
+const increaseUserImageEndpointCount = async (userId: string) => {
+  const settings = await db
+    .update(settingsTable)
+    .set({
+      imageEndpointCount: sql`${settingsTable.imageEndpointCount} + 1`,
+    })
+    .where(UserIdEqualTo(userId))
+    .returning()
+
+  return settings[0]
+}
+
 const settingsDAO = {
+  getUserImageEndpointEnabled,
   getUserTimezone,
   getUserTimezoneAndCreateIfNull,
+  increaseUserImageEndpointCount,
 }
 
 export default settingsDAO

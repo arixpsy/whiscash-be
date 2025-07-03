@@ -28,8 +28,8 @@ export const settingsTable = pgTable('settings', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: varchar().notNull(),
   timezone: varchar().notNull(),
-  imageEndpointCount: integer().default(0),
-  imageEndpointEnabled: boolean().default(false),
+  imageEndpointCount: integer().default(0).notNull(),
+  imageEndpointEnabled: boolean().default(false).notNull(),
 })
 
 export const walletsTable = pgTable(
