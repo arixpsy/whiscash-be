@@ -1,4 +1,5 @@
 import {
+  boolean,
   doublePrecision,
   index,
   integer,
@@ -27,6 +28,8 @@ export const settingsTable = pgTable('settings', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: varchar().notNull(),
   timezone: varchar().notNull(),
+  imageEndpointCount: integer().default(0),
+  imageEndpointEnabled: boolean().default(false),
 })
 
 export const walletsTable = pgTable(
