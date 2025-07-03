@@ -1,8 +1,7 @@
 import { ChatOpenAI } from '@langchain/openai'
 import { ChatPromptTemplate } from '@langchain/core/prompts'
-import type { Response } from 'express'
-import type { TypedRequestBody } from 'zod-express-middleware'
-import type { GetImageTransactionDetailsRequestSchema } from '@/@types/shared'
+import type { Response, Request } from 'express'
+import { unlink, readFileSync } from 'fs'
 import settingsDAO from '@/dao/settingsDAO'
 import response from '@/utils/response'
 
@@ -11,10 +10,7 @@ const model = new ChatOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-export const handleReadImage = async (
-  req: TypedRequestBody<typeof GetImageTransactionDetailsRequestSchema>,
-  res: Response
-) => {
+export const handleReadImage = async (req: Request, res: Response) => {
   const { userId } = req.auth
 
   if (!userId) {
@@ -32,7 +28,38 @@ export const handleReadImage = async (
     })
   }
 
-  const base64 = req.body.image
+  if (!req.file) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Image not found',
+    })
+    return
+  }
+
+  const fileBuffer = readFileSync(req.file.path)
+  const base64 = fileBuffer.toString('base64')
+
+  if (!base64) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid image',
+    })
+    return
+  }
+
+  res.json({
+    amount: 20,
+    category: 'FOOD',
+    description: 'testing',
+  })
+
+  unlink(req.file.path, () => {
+    console.log(`File at [${req.file?.path}] was deleted successfully `)
+  })
+
+  return
+
+  // TODO:
 
   const prompt = ChatPromptTemplate.fromMessages([
     [
