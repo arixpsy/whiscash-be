@@ -27,6 +27,12 @@ const EnvironmentVariablesSchema = z.object({
       (url) => url.startsWith('sk'),
       'CLERK_PUBLISHABLE_KEY must be a valid key'
     ),
+  OPENAI_API_KEY: z
+    .string()
+    .refine(
+      (url) => url.startsWith('sk-proj'),
+      'OPENAI_API_KEY must be a valid key'
+    ),
 })
 
 try {
