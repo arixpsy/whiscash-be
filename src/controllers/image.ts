@@ -7,7 +7,7 @@ import response from '@/utils/response'
 import { Category } from '@/utils/enum'
 
 const model = new ChatOpenAI({
-  model: 'gpt-4.1-nano',
+  model: 'gpt-4.1-mini',
   apiKey: process.env.OPENAI_API_KEY,
 })
 
@@ -75,6 +75,8 @@ export const handleReadImage = async (req: Request, res: Response) => {
       }}
 
       Important:
+      - Only extract "amount" or "paidAt" if they are **explicitly shown in the image** (such as on a price tag, receipt, or clearly visible text). 
+      - **Never guess or estimate** the amount or timestamp based on the appearance of the item or any other visual clues.
       - If an item cannot be reliably extracted, omit its key from the JSON output:
         - Remove "amount" if no valid amount is found.
         - Remove "paidAt" if no valid timestamp is found.
