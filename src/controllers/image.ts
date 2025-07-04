@@ -76,10 +76,11 @@ export const handleReadImage = async (req: Request, res: Response) => {
 
       Important:
       - If an item cannot be reliably extracted, omit its key from the JSON output:
-      - Remove "amount" if no valid amount is found.
-      - Remove "paidAt" if no valid timestamp is found.
-      - Remove "category" if none of the provided categories apply.
-      - Remove "description" if you cannot determine a suitable description.
+        - Remove "amount" if no valid amount is found.
+        - Remove "paidAt" if no valid timestamp is found.
+        - Remove "category" if none of the provided categories apply.
+        - Remove "description" if you cannot determine a suitable description.
+      - If the image shows an item or expense-related content (e.g., a product or service) but no amount or timestamp is found, you should still extract a meaningful "description" and "category".
 
       Additional rules:
       - Only output valid JSON—no extra text, explanations, or comments.
