@@ -114,7 +114,7 @@ export const handleReadImage = async (req: Request, res: Response) => {
 
   settingsDAO.increaseUserImageEndpointCount(
     userId,
-    invokeResponse.response_metadata.tokenUsage.totalTokens
+    invokeResponse.response_metadata.tokenUsage.promptTokens
   )
 
   res.json(parsedResponse)
