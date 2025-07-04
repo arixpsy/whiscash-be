@@ -4,6 +4,7 @@ import type { Response, Request } from 'express'
 import { unlink, readFileSync } from 'fs'
 import settingsDAO from '@/dao/settingsDAO'
 import response from '@/utils/response'
+import { Category } from '@/utils/enum'
 
 const model = new ChatOpenAI({
   model: 'gpt-4.1-mini',
@@ -47,41 +48,72 @@ export const handleReadImage = async (req: Request, res: Response) => {
     return
   }
 
-  res.json({
-    amount: 20,
-    category: 'FOOD',
-    description: 'testing',
-  })
-
-  unlink(req.file.path, () => {
-    console.log(`File at [${req.file?.path}] was deleted successfully `)
-  })
-
-  return
-
-  // TODO:
-
   const prompt = ChatPromptTemplate.fromMessages([
     [
       'system',
-      `You are an expense tracker. Determine if the following image contains information about an expense. Find out the total amount spent, the timestamp of the expense in UTC, and generate a short description of the expense based on the store and items purchased in the image. Also determine a suitable category of the expense based on this list: [Accommodation, Entertainment, Fitness, Food, Games, Gifts, Grooming, Hobbies, Insurance, Medical, Others, Pet, Shopping, Transfers, Transport, Travel, Utilities, Work].
+      `
+      You are an expense tracker assistant. 
+      You will receive an image, likely related to an expense (such as a receipt, invoice, payment confirmation, or a item/product purchased). 
+      
+      Your task:
+      1. Analyze the image to determine whether it contains expense information.
+      2. If it does, extract the following details:
+        - amount: Total amount spent (number with two decimal places).
+        - paidAt: Timestamp of the expense, converted to UTC in ISO 8601 format (e.g., "2025-07-04T12:00:00Z").
+        - description: A short, concise description (under 40 characters), such as store name, purchased item(s), or activity.
+        - category: The most suitable category from the following list:
+          ${Object.values(Category).join(', ')}
 
-      Reply in the following JSON format:
+      
+      Output:
+      Return the result strictly in this JSON format:
       {{
         "amount": 0,
         "category": "",
         "description": "",
         "paidAt": ""
       }}
+
+      Important:
+      - If an item cannot be reliably extracted, omit its key from the JSON output:
+      - Remove "amount" if no valid amount is found.
+      - Remove "paidAt" if no valid timestamp is found.
+      - Remove "category" if none of the provided categories apply.
+      - Remove "description" if you cannot determine a suitable description.
+
+      Additional rules:
+      - Only output valid JSON—no extra text, explanations, or comments.
+      - Be accurate and concise in your extraction.
       `,
     ],
-    ['user', [{ type: 'image_url', image_url: '{base64}' }]],
+    [
+      'user',
+      [
+        {
+          type: 'image',
+          source_type: 'base64',
+          data: base64,
+          mime_type: 'image/jpeg',
+        },
+      ],
+    ],
   ])
 
   const chain = prompt.pipe(model)
   const invokeResponse = await chain.invoke({ base64 })
 
-  console.log(invokeResponse)
+  let parsedResponse = {}
 
-  res.json(invokeResponse.content)
+  try {
+    parsedResponse = JSON.parse(invokeResponse.content as string)
+  } catch (err) {
+    console.log('Error parsing response from model', err)
+    console.log(invokeResponse)
+  }
+
+  res.json(parsedResponse)
+
+  unlink(req.file.path, () => {
+    console.log(`File at [${req.file?.path}] was deleted successfully `)
+  })
 }
