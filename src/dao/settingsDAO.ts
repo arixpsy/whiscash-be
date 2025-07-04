@@ -59,11 +59,13 @@ const getUserTimezoneAndCreateIfNull = async (
   return settingsResult[0].timezone
 }
 
-const increaseUserImageEndpointCount = async (userId: string) => {
+const increaseUserImageEndpointCount = async (userId: string, tokenUsage: number) => {
   const settings = await db
     .update(settingsTable)
     .set({
       imageEndpointCount: sql`${settingsTable.imageEndpointCount} + 1`,
+      imageEndpointInputTokenUsage: sql`${settingsTable.imageEndpointInputTokenUsage} + ${tokenUsage}`,
+
     })
     .where(UserIdEqualTo(userId))
     .returning()

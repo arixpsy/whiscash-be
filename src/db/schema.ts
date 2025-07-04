@@ -29,6 +29,7 @@ export const settingsTable = pgTable('settings', {
   userId: varchar().notNull(),
   timezone: varchar().notNull(),
   imageEndpointCount: integer().default(0).notNull(),
+  imageEndpointInputTokenUsage: integer().default(0).notNull(),
   imageEndpointEnabled: boolean().default(false).notNull(),
 })
 
