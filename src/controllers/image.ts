@@ -7,7 +7,7 @@ import response from '@/utils/response'
 import { Category } from '@/utils/enum'
 
 const model = new ChatOpenAI({
-  model: 'gpt-4.1-mini',
+  model: 'gpt-4.1-nano',
   apiKey: process.env.OPENAI_API_KEY,
 })
 
