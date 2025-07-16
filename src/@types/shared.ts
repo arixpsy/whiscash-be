@@ -5,7 +5,7 @@ const TransactionSchema = z.object({
   id: z.number(),
   walletId: z.number(),
   amount: z.number(),
-  category: z.nativeEnum(Category),
+  category: z.enum(Category),
   description: z.string(),
   paidAt: z.string(),
   subscriptionId: z.number().nullable(),
@@ -14,14 +14,13 @@ const TransactionSchema = z.object({
   deletedAt: z.string().nullable(),
 })
 
-const TransactionWithWalletSchema = TransactionSchema.merge(
-  z.object({
-    currency: z.string(),
-    country: z.string(),
-    name: z.string(),
-    subWalletOf: z.number().nullable(),
-  })
-)
+const TransactionWithWalletSchema = z.object({
+  ...TransactionSchema.shape,
+  currency: z.string(),
+  country: z.string(),
+  name: z.string(),
+  subWalletOf: z.number().nullable(),
+})
 
 const WalletSchema = z.object({
   id: z.number(),
@@ -29,7 +28,7 @@ const WalletSchema = z.object({
   userId: z.string(),
   currency: z.string(),
   country: z.string(),
-  spendingPeriod: z.nativeEnum(SpendingPeriod),
+  spendingPeriod: z.enum(SpendingPeriod),
   orderIndex: z.number(),
   archivedAt: z.string().nullable(),
   subWalletOf: z.number().nullable(),
@@ -38,16 +37,15 @@ const WalletSchema = z.object({
   deletedAt: z.string().nullable(),
 })
 
-const WalletWithSpendingPeriodTotalSchema = WalletSchema.merge(
-  z.object({
-    spendingPeriodTotal: z.number(),
-  })
-)
+const WalletWithSpendingPeriodTotalSchema = z.object({
+  ...WalletSchema.shape,
+  spendingPeriodTotal: z.number(),
+})
 
 export const CreateTransactionRequestSchema = z.object({
   walletId: z.number(),
   amount: z.number(),
-  category: z.nativeEnum(Category),
+  category: z.enum(Category),
   description: z.string().min(1),
   paidAt: z.string().optional(),
 })
@@ -56,7 +54,7 @@ export const CreateWalletRequestSchema = z.object({
   name: z.string().min(1).max(50),
   currency: z.string().length(3),
   country: z.string().length(2),
-  spendingPeriod: z.nativeEnum(SpendingPeriod),
+  spendingPeriod: z.enum(SpendingPeriod),
   subWalletOf: z.number().optional(),
 })
 
@@ -83,19 +81,17 @@ export const GetTransactionsRequestSchema = z.object({
   date: z.string().optional(),
 })
 
-export const GetWalletTransactionsRequestSchema =
-  GetTransactionsRequestSchema.merge(
-    z.object({
-      walletId: z.string(),
-    })
-  )
+export const GetWalletTransactionsRequestSchema = z.object({
+  ...GetTransactionsRequestSchema.shape,
+  walletId: z.string(),
+})
 
 export const GetTransactionsResponseSchema = z.array(
   TransactionWithWalletSchema
 )
 
 export const GetWalletChartDataRequestSchema = z.object({
-  unit: z.nativeEnum(SpendingPeriod),
+  unit: z.enum(SpendingPeriod),
   limit: z.string(),
   offset: z.string().optional(),
 })
@@ -115,13 +111,18 @@ export const GetWalletsRequestSchema = z.object({
 
 export const GetWalletsResponseSchema = z.array(WalletSchema)
 
-export const UpdateTransactionRequestSchema =
-  CreateTransactionRequestSchema.merge(z.object({ id: z.number() }))
+export const UpdateTransactionRequestSchema = z.object({
+  ...CreateTransactionRequestSchema.shape,
+  id: z.number(),
+})
 
-export const UpdateWalletRequestSchema = CreateWalletRequestSchema.omit({
-  currency: true,
-  country: true,
-}).merge(z.object({ id: z.number() }))
+export const UpdateWalletRequestSchema = z.object({
+  ...CreateWalletRequestSchema.omit({
+    currency: true,
+    country: true,
+  }).shape,
+  id: z.number(),
+})
 
 export type CreateTransactionRequest = z.infer<
   typeof CreateTransactionRequestSchema

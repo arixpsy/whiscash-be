@@ -38,7 +38,7 @@ const EnvironmentVariablesSchema = z.object({
 try {
   EnvironmentVariablesSchema.parse(process.env)
 } catch (error) {
-  if (error instanceof ZodError) consola.error(error.errors)
+  if (error instanceof ZodError) consola.error(error.issues)
 
   process.exit(1)
 }
