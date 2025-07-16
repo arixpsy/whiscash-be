@@ -28,7 +28,7 @@ app.get('/healthcheck', (_req, res) => {
 
 app.use('/api', Middleware.authenticate, router)
 
-app.all('*', (_req, res) => {
+app.all('/*splat', (_req, res) => {
   response.notFound(res, {
     message: 'Not found',
     description: 'The route you are accessing does not exist',
