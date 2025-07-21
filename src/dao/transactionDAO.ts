@@ -9,6 +9,7 @@ import {
   inArray,
   isNull,
   sql,
+  or,
   type SQL,
 } from 'drizzle-orm'
 import type { DateTime } from 'luxon'
@@ -44,6 +45,8 @@ const WalletIdEqualTo = (walletId: number) =>
   eq(transactionsTable.walletId, walletId)
 const WalletIdIn = (walletIds: Array<number>) =>
   inArray(transactionsTable.walletId, walletIds)
+const CategoryLike = (searchPhrase: string) =>
+  ilike(transactionsTable.category, `%${searchPhrase}%`)
 const DeletedAtAtIsNull = isNull(transactionsTable.deletedAt)
 const DescriptionLike = (searchPhrase: string) =>
   ilike(transactionsTable.description, `%${searchPhrase}%`)
@@ -221,6 +224,25 @@ const insertTransaction = async (transaction: NewTransaction) => {
   return transactions[0]
 }
 
+const searchTransactions = async (
+  walletsIds: Array<number>,
+  searchPhrase: string,
+  limit: number,
+  offset?: number
+) => {
+  const DescriptionAndCategoryLike = or(
+    DescriptionLike(searchPhrase),
+    CategoryLike(searchPhrase)
+  ) as SQL
+
+  return getTransactions(
+    [WalletIdIn(walletsIds), DescriptionAndCategoryLike],
+    SortByPaidAt,
+    limit,
+    offset
+  )
+}
+
 const updateTransaction = async (id: number, transaction: NewTransaction) => {
   const updatedFields = {
     amount: transaction.amount,
@@ -248,6 +270,7 @@ const transactionDAO = {
   getTransactionsByWalletId,
   getWalletChartData,
   insertTransaction,
+  searchTransactions,
   updateTransaction,
 }
 

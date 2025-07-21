@@ -15,6 +15,7 @@ import {
   getTransactionById,
   getAllTransactions,
   updateTransaction,
+  searchAllTransactions,
 } from '@/controllers/transaction'
 import { TransactionIdParamsSchema } from '@/@types/transactions'
 
@@ -24,6 +25,11 @@ transactionRoutes.get(
   '/',
   validateRequestQuery(GetTransactionsRequestSchema),
   getAllTransactions
+)
+transactionRoutes.get(
+  '/search',
+  validateRequestQuery(GetTransactionsRequestSchema),
+  searchAllTransactions
 )
 transactionRoutes.get(
   '/:transactionId',

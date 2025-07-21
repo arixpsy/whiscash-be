@@ -79,6 +79,7 @@ export const GetTransactionsRequestSchema = z.object({
   limit: z.string(),
   offset: z.string().optional(),
   date: z.string().optional(),
+  searchPhrase: z.string().optional(),
 })
 
 export const GetWalletTransactionsRequestSchema = z.object({

@@ -134,6 +134,38 @@ export const getAllTransactions = async (
   response.ok(res, transactions)
 }
 
+export const searchAllTransactions = async (
+  req: TypedRequestQuery<typeof GetTransactionsRequestSchema>,
+  res: Response
+) => {
+  const { userId } = req.auth
+  const { limit, offset, searchPhrase = '' } = req.query
+
+  if (!userId) {
+    response.unauthorized(res)
+    return
+  }
+
+  if (!searchPhrase) {
+    response.badRequest(res, {
+      message: 'Bad request',
+      description: 'Invalid search phrase',
+    })
+    return
+  }
+
+  const allWallets = await walletDAO.getAllWallets(userId, {})
+
+  const transactions = await transactionDAO.searchTransactions(
+    allWallets.map((wallet) => wallet.id),
+    searchPhrase,
+    limit ? parseInt(limit) : 10,
+    offset ? parseInt(offset) : 0
+  )
+
+  response.ok(res, transactions)
+}
+
 export const getTransactionsByWalletId = async (
   req: TypedRequestQuery<typeof GetWalletTransactionsRequestSchema>,
   res: Response
