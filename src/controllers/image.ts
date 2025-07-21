@@ -48,6 +48,8 @@ export const handleReadImage = async (req: Request, res: Response) => {
     return
   }
 
+  const timezone = settingsDAO.getUserTimezone(userId)
+
   const prompt = ChatPromptTemplate.fromMessages([
     [
       'system',
@@ -59,7 +61,7 @@ export const handleReadImage = async (req: Request, res: Response) => {
       1. Analyze the image to determine whether it contains expense information.
       2. If it does, extract the following details:
         - amount: Total amount spent (number with two decimal places).
-        - paidAt: Timestamp of the expense, converted to UTC in ISO 8601 format (e.g., "2025-07-04T12:00:00Z").
+        - paidAt: The **local date and time of the expense**, if shown. Assume all dates and times in the image are in the "${timezone}" timezone. If the image shows a date without a year (e.g., "Jul 20"), **use the current year**. Convert the resulting local time to UTC and return it in ISO 8601 format (e.g., "2025-07-20T06:21:00Z").
         - description: A short, concise description (under 40 characters), such as store name, purchased item(s), or activity.
         - category: The most suitable category from the following list:
           ${Object.values(Category).join(', ')}
@@ -77,6 +79,12 @@ export const handleReadImage = async (req: Request, res: Response) => {
       Important:
       - Only extract "amount" or "paidAt" if they are **explicitly shown in the image** (such as on a price tag, receipt, or clearly visible text). 
       - **Never guess or estimate** the amount or timestamp based on the appearance of the item or any other visual clues.
+      - When extracting "paidAt":
+        - Identify the date/time in the image.
+        - Assume it is in the "${timezone}" timezone.
+        - If the year is missing, use the current year.
+        - Convert to UTC.
+        - Format it in ISO 8601 (e.g., "2025-07-04T12:00:00Z").
       - If an item cannot be reliably extracted, omit its key from the JSON output:
         - Remove "amount" if no valid amount is found.
         - Remove "paidAt" if no valid timestamp is found.
