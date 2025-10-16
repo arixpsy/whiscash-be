@@ -16,6 +16,7 @@ export const Category = {
   Food: 'FOOD',
   Games: 'GAMES',
   Gifts: 'GIFTS',
+  Groceries: 'GROCERIES',
   Grooming: 'GROOMING',
   Hobbies: 'HOBBIES',
   Insurance: 'INSURANCE',
