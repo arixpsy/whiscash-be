@@ -46,7 +46,7 @@ const WalletIdEqualTo = (walletId: number) =>
 const WalletIdIn = (walletIds: Array<number>) =>
   inArray(transactionsTable.walletId, walletIds)
 const CategoryLike = (searchPhrase: string) =>
-  ilike(transactionsTable.category, `%${searchPhrase}%`)
+  ilike(sql`CAST(${transactionsTable.category} AS TEXT)`, `%${searchPhrase}%`)
 const DeletedAtAtIsNull = isNull(transactionsTable.deletedAt)
 const DescriptionLike = (searchPhrase: string) =>
   ilike(transactionsTable.description, `%${searchPhrase}%`)
